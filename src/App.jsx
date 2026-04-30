@@ -1,60 +1,93 @@
-import { useEffect } from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Stats from './components/Stats';
-import Timeline from './components/Timeline';
-import HowItWorks from './components/HowItWorks';
-import PollMap from './components/PollMap';
-import Quiz from './components/Quiz';
-import Glossary from './components/Glossary';
-import CTA from './components/CTA';
-import Footer from './components/Footer';
-import HelpButton from './components/HelpButton';
+import React, { Suspense, lazy } from 'react';
+import { useScrollReveal } from './hooks/useScrollReveal';
 import { GoogleTranslateInit } from './components/GoogleTranslate';
+import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
+import { HelpButton } from './components/HelpButton';
+import { ARIA_LABELS, APP_NAME, SKIP_LINK_TARGET } from './constants';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { LoadingSpinner } from './components/LoadingSpinner';
 
-function useScrollReveal() {
-  useEffect(() => {
-    const items = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add('visible');
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-    items.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  });
-}
+// Route-level code splitting with React.lazy
+const Hero      = lazy(() => import('./components/Hero').then((m) => ({ default: m.Hero })));
+const Stats     = lazy(() => import('./components/Stats').then((m) => ({ default: m.Stats })));
+const Timeline  = lazy(() => import('./components/Timeline').then((m) => ({ default: m.Timeline })));
+const HowItWorks= lazy(() => import('./components/HowItWorks').then((m) => ({ default: m.HowItWorks })));
+const PollMap   = lazy(() => import('./components/PollMap').then((m) => ({ default: m.PollMap })));
+const Quiz      = lazy(() => import('./components/Quiz').then((m) => ({ default: m.Quiz })));
+const Glossary  = lazy(() => import('./components/Glossary').then((m) => ({ default: m.Glossary })));
+const CTA       = lazy(() => import('./components/CTA').then((m) => ({ default: m.CTA })));
 
-export default function App() {
+/** Root application component. Assembles all page sections with lazy loading. */
+function App() {
   useScrollReveal();
 
   return (
     <>
-      {/* Loads Google Translate script + exposes window.__setGoogleTranslateLang */}
+      {/* Google Translate initialiser (no visible DOM output) */}
       <GoogleTranslateInit />
 
-      <a id="skip-link" href="#main-content">
-        Skip to main content
+      {/* Accessibility: skip navigation link */}
+      <a id="skip-link" href={`#${SKIP_LINK_TARGET}`} className="skip-link">
+        {ARIA_LABELS.SKIP_LINK}
       </a>
+
       <Navbar />
-      <main id="main-content">
-        <Hero />
-        <Stats />
-        <Timeline />
-        <HowItWorks />
-        <PollMap />
-        <Quiz />
-        <Glossary />
-        <CTA />
+
+      <main id={SKIP_LINK_TARGET} aria-label={`${APP_NAME} main content`}>
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner label="Loading Hero section" />}>
+            <Hero />
+          </Suspense>
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner label="Loading statistics" />}>
+            <Stats />
+          </Suspense>
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner label="Loading election timeline" />}>
+            <Timeline />
+          </Suspense>
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner label="Loading process steps" />}>
+            <HowItWorks />
+          </Suspense>
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner label="Loading polling station map" />}>
+            <PollMap />
+          </Suspense>
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner label="Loading knowledge quiz" />}>
+            <Quiz />
+          </Suspense>
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner label="Loading glossary" />}>
+            <Glossary />
+          </Suspense>
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingSpinner label="Loading call to action" />}>
+            <CTA />
+          </Suspense>
+        </ErrorBoundary>
       </main>
+
       <Footer />
       <HelpButton />
     </>
   );
 }
+
+export { App };

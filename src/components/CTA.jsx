@@ -1,4 +1,5 @@
-export default function CTA() {
+/** Call-to-action section encouraging civic participation. */
+function CTA() {
   return (
     <section className="cta-section" aria-labelledby="cta-heading">
       <div className="cta-inner">
@@ -14,11 +15,7 @@ export default function CTA() {
         </h2>
         <p
           className="section-desc reveal"
-          style={{
-            textAlign: 'center',
-            margin: '1.3rem auto 2.8rem',
-            maxWidth: '50ch',
-          }}
+          style={{ textAlign: 'center', margin: '1.3rem auto 2.8rem', maxWidth: '50ch' }}
         >
           Democracy works when citizens are informed and engaged. Share this resource with friends
           and family to help them understand the process too.
@@ -35,3 +32,5 @@ export default function CTA() {
     </section>
   );
 }
+
+export { CTA };

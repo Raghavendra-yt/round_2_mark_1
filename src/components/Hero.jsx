@@ -1,39 +1,43 @@
-import { useEffect, useRef } from 'react';
+import { useRef, memo } from 'react';
 
-function Particle({ size, left, duration, delay }) {
+/** Single animated particle in the hero background. */
+const Particle = memo(function Particle({ size, left, duration, delay }) {
   return (
     <div
       className="particle"
       style={{
-        width: size + 'px',
-        height: size + 'px',
-        left: left + '%',
-        animationDuration: duration + 's',
-        animationDelay: delay + 's',
+        width:             `${size}px`,
+        height:            `${size}px`,
+        left:              `${left}%`,
+        animationDuration: `${duration}s`,
+        animationDelay:    `${delay}s`,
       }}
     />
   );
-}
+});
 
-export default function Hero() {
-  const particles = Array.from({ length: 14 }, (_, i) => ({
-    id: i,
-    size: Math.random() * 4 + 2,
-    left: Math.random() * 100,
-    duration: Math.random() * 18 + 12,
-    delay: Math.random() * -20,
-  }));
+Particle.displayName = 'Particle';
 
-  // Stable ref so particles don't re-randomize on re-render
-  const particlesRef = useRef(particles);
+/** Full-bleed hero section with animated particles and CTA buttons. */
+function Hero() {
+  // Stable particles via ref — won't re-randomize on re-renders
+  const particlesRef = useRef(
+    Array.from({ length: 14 }, (_, index) => ({
+      id:       index,
+      size:     Math.random() * 4 + 2,
+      left:     Math.random() * 100,
+      duration: Math.random() * 18 + 12,
+      delay:    Math.random() * -20,
+    }))
+  );
 
   return (
     <section id="hero" aria-labelledby="hero-heading" className="hero">
       <div className="hero-bg" aria-hidden="true" />
       <div className="hero-grid" aria-hidden="true" />
       <div className="hero-particles" id="particles" aria-hidden="true">
-        {particlesRef.current.map((p) => (
-          <Particle key={p.id} {...p} />
+        {particlesRef.current.map((particle) => (
+          <Particle key={particle.id} {...particle} />
         ))}
       </div>
 
@@ -45,9 +49,9 @@ export default function Hero() {
           Understand the Power of Your <em>Vote</em>
         </h1>
         <p className="hero-sub">
-          A comprehensive, accessible guide to how elections work — from candidacy declaration to
-          official certification. Learn the process, test your knowledge, and participate with
-          confidence.
+          A comprehensive, accessible guide to how elections work — from candidacy declaration
+          to official certification. Learn the process, test your knowledge, and participate
+          with confidence.
         </p>
         <div className="hero-cta">
           <a href="#timeline" className="btn-primary">
@@ -66,3 +70,5 @@ export default function Hero() {
     </section>
   );
 }
+
+export { Hero };

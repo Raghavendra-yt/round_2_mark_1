@@ -3,18 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ── SEO ──────────────────────────────────────────────────────────────── -->
+    <title>ElectED — Election Process Education</title>
     <meta
       name="description"
       content="ElectED — A non-partisan, accessible guide to the election process. Learn how democracy works, test your knowledge, and participate with confidence."
     />
     <meta name="theme-color" content="#f5f3ee" />
-    <title>ElectED — Election Process Education</title>
+    <meta name="robots" content="index, follow" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ElectED — Election Process Education" />
+    <meta property="og:description" content="A comprehensive, accessible guide to how elections work." />
+
+    <!-- ── Security Headers (as meta tags) ───────────────────────────────── -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Permissions-Policy" content="geolocation=(self), camera=(), microphone=()" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://translate.google.com https://translate.googleapis.com https://www.google-analytics.com https://maps.googleapis.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://translate.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: https://maps.gstatic.com https://maps.googleapis.com https://www.gstatic.com;
+        connect-src 'self' https://api.open-meteo.com https://nominatim.openstreetmap.org https://firestore.googleapis.com https://www.googleapis.com;
+        frame-src https://translate.google.com https://translate.googleapis.com;
+        worker-src 'self';
+      "
+    />
+
+    <!-- ── Resource Hints ────────────────────────────────────────────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      rel="preload"
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

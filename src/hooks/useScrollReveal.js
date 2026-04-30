@@ -1,48 +1,35 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
+import { INTERSECTION_THRESHOLD } from '../constants';
 
 /**
- * Attaches an IntersectionObserver to each element matching the selector
- * and adds the 'visible' class when they enter the viewport.
+ * Observes all elements with class `.reveal` and adds `.visible`
+ * when they intersect the viewport. Cleans up on unmount.
+ *
+ * @param {number} [threshold] - Intersection threshold (0–1).
  */
-export function useScrollReveal(selector = '.reveal', threshold = 0.12) {
-  useEffect(() => {
-    const items = document.querySelectorAll(selector);
-    const io = new IntersectionObserver(
+export function useScrollReveal(threshold = INTERSECTION_THRESHOLD) {
+  const observerRef = useRef(null);
+
+  const observe = useCallback(() => {
+    const items = document.querySelectorAll('.reveal');
+    observerRef.current = new IntersectionObserver(
       (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add('visible');
-            io.unobserve(e.target);
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observerRef.current?.unobserve(entry.target);
           }
         });
       },
       { threshold }
     );
-    items.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  });
-}
+    items.forEach((element) => observerRef.current?.observe(element));
+  }, [threshold]);
 
-/**
- * Attaches an IntersectionObserver to animate width of elements with
- * a data-target attribute (used for category bar fills).
- */
-export function useCatBarAnimation() {
   useEffect(() => {
-    const fills = document.querySelectorAll('.cat-fill');
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            const target = e.target.getAttribute('data-target');
-            e.target.style.width = target + '%';
-            io.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-    fills.forEach((f) => io.observe(f));
-    return () => io.disconnect();
-  });
+    observe();
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, [observe]);
 }

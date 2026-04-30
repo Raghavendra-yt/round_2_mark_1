@@ -318,3 +318,28 @@ footer{border-top:1px solid var(--border);padding:3rem 4rem;display:flex;align-i
   .btn-primary,.btn-outline{width:100%;justify-content:center}
   .lang-btn span{display:none}
 }
+
+/* ── SKIP LINK (class-based for App.jsx) ── */
+.skip-link{position:absolute;top:-100%;left:1rem;z-index:9999;padding:0.6rem 1.4rem;background:var(--accent);color:#fff;font-weight:700;font-size:0.9rem;border-radius:6px;text-decoration:none;transition:top 0.2s}
+.skip-link:focus{top:1rem}
+
+/* ── LOADING SPINNER ── */
+.loading-spinner-container{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;gap:1rem}
+.loading-spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite}
+.loading-spinner-text{font-size:0.82rem;color:var(--text-muted);letter-spacing:0.05em}
+
+/* ── ERROR BOUNDARY ── */
+.error-boundary{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;text-align:center;gap:1rem;max-width:480px;margin:0 auto}
+.error-boundary-icon{font-size:2.5rem}
+.error-boundary-title{font-family:var(--ff-display);font-size:1.3rem;font-weight:700;color:var(--text)}
+.error-boundary-message{font-size:0.88rem;color:var(--text-muted);line-height:1.65}
+
+/* ── GLOSSARY SEARCH ── */
+.glossary-search{margin-top:2rem}
+.glossary-search-input{width:100%;max-width:420px;padding:0.75rem 1.1rem;border:1.5px solid var(--border);border-radius:10px;font-family:var(--ff-body);font-size:0.9rem;color:var(--text);background:var(--surface);outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+.glossary-search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.glossary-empty{grid-column:1/-1;padding:2rem;text-align:center;color:var(--text-muted);font-size:0.9rem}
+
+/* ── SAVE SCORE ERROR ── */
+.save-error{color:var(--red);font-size:0.82rem;margin-top:0.5rem}
+
