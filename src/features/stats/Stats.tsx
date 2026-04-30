@@ -1,14 +1,29 @@
-import { memo, useMemo } from 'react';
+import React, { memo, useMemo, ReactNode } from 'react';
 
-const STATS_DATA = [
+// --- Types ---
+interface StatItemProps {
+  value: string;
+  label: string;
+  aria: string;
+}
+
+interface StatsProps {
+  children: ReactNode;
+  ariaLabel?: string;
+}
+
+const STATS_DATA: StatItemProps[] = [
   { value: '6',    label: 'Election Phases',   aria: '6 election phases' },
   { value: '10+',  label: 'Key Terms Defined', aria: '10 or more key terms defined' },
   { value: '5',    label: 'Quiz Questions',    aria: '5 quiz questions' },
   { value: '100%', label: 'Free to Access',   aria: '100 percent free to access' },
 ];
 
-/** Individual statistic display item. */
-const StatItem = memo(function StatItem({ value, label, aria }) {
+/** 
+ * Compound Component Pattern: 
+ * Allows flexible composition of statistic components.
+ */
+const StatItem = memo(function StatItem({ value, label, aria }: StatItemProps) {
   return (
     <div className="stat-item reveal" role="listitem">
       <div className="stat-num" aria-label={aria}>{value}</div>
@@ -16,20 +31,35 @@ const StatItem = memo(function StatItem({ value, label, aria }) {
     </div>
   );
 });
+StatItem.displayName = 'Stats.Item';
 
-StatItem.displayName = 'StatItem';
-
-/** Key statistics banner shown below the hero. */
-function Stats() {
-  const stats = useMemo(() => STATS_DATA, []);
-
+/** Container component for stats items */
+function StatsContainer({ children, ariaLabel = "Key statistics about ElectED" }: StatsProps) {
   return (
-    <div className="stats" role="list" aria-label="Key statistics about ElectED">
-      {stats.map((stat) => (
-        <StatItem key={stat.label} {...stat} />
-      ))}
+    <div className="stats" role="list" aria-label={ariaLabel}>
+      {children}
     </div>
   );
 }
 
-export { Stats };
+// Bind sub-components
+const Stats = Object.assign(StatsContainer, {
+  Item: StatItem,
+});
+
+/** 
+ * Example usage using the Compound Component Pattern 
+ */
+export function StatsSection() {
+  const stats = useMemo(() => STATS_DATA, []);
+
+  return (
+    <Stats ariaLabel="Key statistics about ElectED">
+      {stats.map((stat) => (
+        <Stats.Item key={stat.label} {...stat} />
+      ))}
+    </Stats>
+  );
+}
+
+export { Stats, STATS_DATA };

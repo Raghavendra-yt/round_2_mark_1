@@ -10,7 +10,7 @@ import { LoadingSpinner } from './components/LoadingSpinner';
 
 // Route-level code splitting with React.lazy
 const Hero      = lazy(() => import('./components/Hero').then((m) => ({ default: m.Hero })));
-const Stats     = lazy(() => import('./components/Stats').then((m) => ({ default: m.Stats })));
+const Stats     = lazy(() => import('./features/stats/Stats').then((m) => ({ default: m.StatsSection })));
 const Timeline  = lazy(() => import('./components/Timeline').then((m) => ({ default: m.Timeline })));
 const HowItWorks= lazy(() => import('./components/HowItWorks').then((m) => ({ default: m.HowItWorks })));
 const PollMap   = lazy(() => import('./components/PollMap').then((m) => ({ default: m.PollMap })));
@@ -28,13 +28,15 @@ function App() {
       <GoogleTranslateInit />
 
       {/* Accessibility: skip navigation link */}
-      <a id="skip-link" href={`#${SKIP_LINK_TARGET}`} className="skip-link">
+      <a id="skip-link" href={`#${SKIP_LINK_TARGET}`} className="skip-link sr-only focus:not-sr-only focus:absolute focus:p-4 focus:bg-primary focus:text-white z-50">
         {ARIA_LABELS.SKIP_LINK}
       </a>
 
-      <Navbar />
+      <header role="banner">
+        <Navbar />
+      </header>
 
-      <main id={SKIP_LINK_TARGET} aria-label={`${APP_NAME} main content`}>
+      <main id={SKIP_LINK_TARGET} role="main" aria-label={`${APP_NAME} main content`}>
         <ErrorBoundary>
           <Suspense fallback={<LoadingSpinner label="Loading Hero section" />}>
             <Hero />
@@ -84,7 +86,9 @@ function App() {
         </ErrorBoundary>
       </main>
 
-      <Footer />
+      <footer role="contentinfo">
+        <Footer />
+      </footer>
       <HelpButton />
     </>
   );
