@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Leaderboard scores
+    match /quizScores/{scoreId} {
+      // Anyone can create a score, but it must be valid
+      allow create: if request.resource.data.name is string 
+                    && request.resource.data.score is number
+                    && request.resource.data.total is number
+                    && request.resource.data.name.size() <= 32;
+      
+      // Only the app (reading the top 5) should list scores
+      allow read: if true; 
+      
+      // No one can update or delete scores once posted
+      allow update, delete: if false;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

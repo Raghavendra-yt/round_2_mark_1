@@ -1,9 +1,15 @@
 import { memo } from 'react';
-import PropTypes from 'prop-types';
-import { steps } from '../data/content';
+import { steps } from '@/data/content';
+
+interface StepCardProps {
+  num: string;
+  icon: string;
+  title: string;
+  desc: string;
+}
 
 /** Single voter step card. */
-const StepCard = memo(function StepCard({ num, icon, title, desc }) {
+const StepCard = memo(({ num, icon, title, desc }: StepCardProps) => {
   return (
     <article className="step-card reveal" role="listitem">
       <div className="step-num" aria-hidden="true">{num}</div>
@@ -15,15 +21,9 @@ const StepCard = memo(function StepCard({ num, icon, title, desc }) {
 });
 
 StepCard.displayName = 'StepCard';
-StepCard.propTypes = {
-  num:   PropTypes.string.isRequired,
-  icon:  PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  desc:  PropTypes.string.isRequired,
-};
 
 /** Section detailing the steps every voter should know. */
-function HowItWorks() {
+export const HowItWorks = () => {
   return (
     <section id="how" aria-labelledby="how-heading">
       <div className="section-inner">
@@ -38,12 +38,10 @@ function HowItWorks() {
 
         <div className="steps-grid reveal-stagger" role="list">
           {steps.map((step) => (
-            <StepCard key={step.num} {...step} />
+            <StepCard key={step.num} num={step.num} icon={step.icon} title={step.title} desc={step.desc} />
           ))}
         </div>
       </div>
     </section>
   );
-}
-
-export { HowItWorks };
+};

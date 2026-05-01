@@ -1,4 +1,4 @@
-import React, { memo, useMemo, ReactNode } from 'react';
+import { memo, useMemo, ReactNode } from 'react';
 
 // --- Types ---
 interface StatItemProps {

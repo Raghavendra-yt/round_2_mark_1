@@ -1,8 +1,13 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import { tests, categoryScores } from '../data/content';
 
-function CatCard({ name, score }) {
-  const fillRef = useRef(null);
+interface CatCardProps {
+  name: string;
+  score: number;
+}
+
+const CatCard = memo(({ name, score }: CatCardProps) => {
+  const fillRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const el = fillRef.current;
@@ -34,9 +39,14 @@ function CatCard({ name, score }) {
       </div>
     </div>
   );
-}
+});
 
-export default function Tests() {
+CatCard.displayName = 'CatCard';
+
+/**
+ * Section detailing the QA metrics and automated test results.
+ */
+export const Tests = () => {
   return (
     <section id="tests" aria-labelledby="tests-heading">
       <div className="section-inner">
@@ -102,4 +112,4 @@ export default function Tests() {
       </div>
     </section>
   );
-}
+};

@@ -1,31 +1,28 @@
-// Jest global setup — imported by all test files via setupFilesAfterFramework
 import '@testing-library/jest-dom';
+import { vi } from 'vitest';
+import { ReactNode } from 'react';
 
-// Mock window.matchMedia (not available in jsdom)
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: jest.fn().mockImplementation((query) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
+vi.mock('firebase/app', () => import('./__mocks__/firebase/app'));
+vi.mock('firebase/auth', () => import('./__mocks__/firebase/auth'));
+vi.mock('firebase/firestore', () => import('./__mocks__/firebase/firestore'));
+vi.mock('firebase/storage', () => import('./__mocks__/firebase/storage'));
+
+vi.mock('@react-google-maps/api', () => ({
+  useLoadScript: () => ({ isLoaded: true, loadError: null }),
+  GoogleMap: ({ children }: { children: ReactNode }) => `<div data-testid="google-map">${children}</div>`,
+  Marker: () => '<div data-testid="marker"></div>',
+  InfoWindow: ({ children }: { children: ReactNode }) => `<div data-testid="info-window">${children}</div>`,
+}));
+
+// Mock IntersectionObserver as a class-like function
+window.IntersectionObserver = vi.fn().mockImplementation(function () {
+  return {
+    observe: vi.fn(),
+    unobserve: vi.fn(),
+    disconnect: vi.fn(),
+    takeRecords: vi.fn(() => []),
+    root: null,
+    rootMargin: '',
+    thresholds: [],
+  };
 });
-
-// Mock IntersectionObserver
-class MockIntersectionObserver {
-  constructor(callback) {
-    this.callback = callback;
-  }
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-global.IntersectionObserver = MockIntersectionObserver;
-
-// Silence act() warnings in some test environments
-global.IS_REACT_ACT_ENVIRONMENT = true;

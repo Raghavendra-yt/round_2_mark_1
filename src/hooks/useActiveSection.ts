@@ -7,10 +7,10 @@ import { SECTION_IDS } from '../constants';
  *
  * @returns {string} ID of the currently active section.
  */
-export function useActiveSection() {
-  const [activeSection, setActiveSection] = useState(SECTION_IDS[0]);
+export const useActiveSection = (): string => {
+  const [activeSection, setActiveSection] = useState<string>(SECTION_IDS[0]);
 
-  const observe = useCallback(() => {
+  const observe = useCallback((): IntersectionObserver => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -36,4 +36,4 @@ export function useActiveSection() {
   }, [observe]);
 
   return activeSection;
-}
+};

@@ -9,7 +9,7 @@ import { GEOCODE_API_BASE } from '../constants';
  * @returns {Promise<string>} Location name (city, town, village, or county).
  * @throws {Error} on network errors
  */
-export async function reverseGeocode(latitude, longitude) {
+export const reverseGeocode = async (latitude: number, longitude: number): Promise<string> => {
   const url = new URL(GEOCODE_API_BASE);
   url.searchParams.set('lat', String(latitude));
   url.searchParams.set('lon', String(longitude));
@@ -24,4 +24,4 @@ export async function reverseGeocode(latitude, longitude) {
   const data = await response.json();
   const { address } = data;
   return address.city ?? address.town ?? address.village ?? address.county ?? 'Your Area';
-}
+};

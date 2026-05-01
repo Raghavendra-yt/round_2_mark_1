@@ -4,14 +4,14 @@ import { useState, useCallback } from 'react';
  * Manages async fetch state: loading, data, and error.
  * Caches results in sessionStorage by URL to avoid redundant requests.
  *
- * @returns {{ data, loading, error, fetchData }} Hook API.
+ * @returns {{ data: T | null, loading: boolean, error: string | null, fetchData: (url: string, options?: RequestInit) => Promise<void> }} Hook API.
  */
-export function useFetch() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+export const useFetch = <T>() => {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchData = useCallback(async (url, options = {}) => {
+  const fetchData = useCallback(async (url: string, options: RequestInit = {}): Promise<void> => {
     if (!url) return;
 
     const cacheKey = `fetch_cache_${url}`;
@@ -40,7 +40,7 @@ export function useFetch() {
       } catch {
         // SessionStorage quota exceeded — ignore
       }
-    } catch (fetchError) {
+    } catch (fetchError: unknown) {
       setError(fetchError instanceof Error ? fetchError.message : String(fetchError));
     } finally {
       setLoading(false);
@@ -48,4 +48,4 @@ export function useFetch() {
   }, []);
 
   return { data, loading, error, fetchData };
-}
+};

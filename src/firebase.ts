@@ -1,7 +1,7 @@
-import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { getAnalytics, isSupported } from 'firebase/analytics';
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getAuth, Auth } from 'firebase/auth';
+import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -14,14 +14,14 @@ const firebaseConfig = {
 };
 
 // Check if Firebase is configured (not just placeholder values)
-export const isFirebaseConfigured =
-  firebaseConfig.apiKey &&
+export const isFirebaseConfigured: boolean =
+  !!firebaseConfig.apiKey &&
   !firebaseConfig.apiKey.includes('YOUR_');
 
-let app = null;
-let db = null;
-let auth = null;
-let analytics = null;
+let app: FirebaseApp | null = null;
+let db: Firestore | null = null;
+let auth: Auth | null = null;
+let analytics: Analytics | null = null;
 
 if (isFirebaseConfigured) {
   // Avoid initializing multiple times (HMR)
@@ -32,7 +32,7 @@ if (isFirebaseConfigured) {
   // Analytics is optional and only works in browser with valid config
   isSupported()
     .then((yes) => {
-      if (yes) analytics = getAnalytics(app);
+      if (yes && app) analytics = getAnalytics(app);
     })
     .catch(() => {});
 }

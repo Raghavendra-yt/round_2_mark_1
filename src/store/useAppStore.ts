@@ -17,5 +17,5 @@ export const useAppStore = create<AppState>((set) => ({
   toggleMenu: () => set((state) => ({ isMenuOpen: !state.isMenuOpen })),
   closeMenu: () => set({ isMenuOpen: false }),
   language: 'en',
-  setLanguage: (lang) => set({ language: lang }),
+  setLanguage: (lang: string) => set({ language: lang }),
 }));

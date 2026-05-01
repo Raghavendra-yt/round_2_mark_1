@@ -1,47 +1,37 @@
-import React from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
+
+interface Props {
+  children: ReactNode;
+  fallback: ReactNode;
+  componentName: string;
+}
+
+interface State {
+  hasError: boolean;
+}
 
 /**
- * ErrorBoundary catches rendering errors in child components and renders
- * a user-friendly fallback instead of a blank page.
+ * Generic Error Boundary to catch UI errors and prevent app crashes.
+ * Logs errors to console (and could be extended to log to Analytics).
  */
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, errorMessage: '' };
+export class ErrorBoundary extends Component<Props, State> {
+  public state: State = {
+    hasError: false,
+  };
+
+  public static getDerivedStateFromError(): State {
+    return { hasError: true };
   }
 
-  static getDerivedStateFromError(error) {
-    return { hasError: true, errorMessage: error?.message ?? 'Unknown error' };
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error(`Error in ${this.props.componentName}:`, error, errorInfo);
   }
 
-  componentDidCatch(error, info) {
-    // In production, forward to an error-reporting service here
-    if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.error('[ErrorBoundary]', error, info);
-    }
-  }
-
-  render() {
+  public render() {
     if (this.state.hasError) {
-      return (
-        <div className="error-boundary" role="alert" aria-live="assertive">
-          <div className="error-boundary-icon" aria-hidden="true">⚠️</div>
-          <h2 className="error-boundary-title">Something went wrong</h2>
-          <p className="error-boundary-message">
-            This section encountered an error and could not load.
-          </p>
-          <button
-            className="btn-outline"
-            onClick={() => this.setState({ hasError: false, errorMessage: '' })}
-          >
-            Try again
-          </button>
-        </div>
-      );
+      return this.props.fallback;
     }
+
     return this.props.children;
   }
 }
-
-export { ErrorBoundary };

@@ -1,16 +1,23 @@
 import { useRef, memo } from 'react';
 
+interface ParticleProps {
+  size: number;
+  left: number;
+  duration: number;
+  delay: number;
+}
+
 /** Single animated particle in the hero background. */
-const Particle = memo(function Particle({ size, left, duration, delay }) {
+const Particle = memo(({ size, left, duration, delay }: ParticleProps) => {
   return (
     <div
       className="particle"
       style={{
-        width:             `${size}px`,
-        height:            `${size}px`,
-        left:              `${left}%`,
+        width: `${size}px`,
+        height: `${size}px`,
+        left: `${left}%`,
         animationDuration: `${duration}s`,
-        animationDelay:    `${delay}s`,
+        animationDelay: `${delay}s`,
       }}
     />
   );
@@ -19,15 +26,15 @@ const Particle = memo(function Particle({ size, left, duration, delay }) {
 Particle.displayName = 'Particle';
 
 /** Full-bleed hero section with animated particles and CTA buttons. */
-function Hero() {
+export const Hero = () => {
   // Stable particles via ref — won't re-randomize on re-renders
   const particlesRef = useRef(
     Array.from({ length: 14 }, (_, index) => ({
-      id:       index,
-      size:     Math.random() * 4 + 2,
-      left:     Math.random() * 100,
+      id: index,
+      size: Math.random() * 4 + 2,
+      left: Math.random() * 100,
       duration: Math.random() * 18 + 12,
-      delay:    Math.random() * -20,
+      delay: Math.random() * -20,
     }))
   );
 
@@ -37,7 +44,13 @@ function Hero() {
       <div className="hero-grid" aria-hidden="true" />
       <div className="hero-particles" id="particles" aria-hidden="true">
         {particlesRef.current.map((particle) => (
-          <Particle key={particle.id} {...particle} />
+          <Particle
+            key={particle.id}
+            size={particle.size}
+            left={particle.left}
+            duration={particle.duration}
+            delay={particle.delay}
+          />
         ))}
       </div>
 
@@ -69,6 +82,4 @@ function Hero() {
       </div>
     </section>
   );
-}
-
-export { Hero };
+};

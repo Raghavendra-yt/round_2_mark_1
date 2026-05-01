@@ -1,14 +1,29 @@
-import { useState, useCallback, memo } from 'react';
-import PropTypes from 'prop-types';
+import { useState, useCallback, memo, KeyboardEvent, MouseEvent } from 'react';
 import { useActiveSection } from '../hooks/useActiveSection';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { GoogleTranslateInit } from './GoogleTranslate';
 import { LANGUAGES, NAV_LINKS, APP_NAME, ARIA_LABELS, STORAGE_KEYS } from '../constants';
 
+interface Language {
+  code: string;
+  gtCode: string;
+  label: string;
+  flag: string;
+}
+
+interface NavLinkProps {
+  href: string;
+  label: string;
+  aria: string;
+  sectionId: string;
+  activeSection: string;
+  onClick: () => void;
+}
+
 // ── Icon Components ───────────────────────────────────────────────────────────
 
 /** Globe SVG icon for the language switcher. */
-const GlobeIcon = memo(function GlobeIcon() {
+const GlobeIcon = memo(() => {
   return (
     <svg
       width="15"
@@ -31,7 +46,7 @@ const GlobeIcon = memo(function GlobeIcon() {
 GlobeIcon.displayName = 'GlobeIcon';
 
 /** Chevron-down icon for the language dropdown toggle. */
-const ChevronDownIcon = memo(function ChevronDownIcon() {
+const ChevronDownIcon = memo(() => {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13" aria-hidden="true">
       <path
@@ -51,20 +66,20 @@ ChevronDownIcon.displayName = 'ChevronDownIcon';
  * Dropdown that lets users choose a display language via Google Translate.
  * Selected language is persisted to localStorage.
  */
-function LanguageSwitcher() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedCode, setSelectedCode] = useLocalStorage(STORAGE_KEYS.LANGUAGE, 'en');
+const LanguageSwitcher = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [selectedCode, setSelectedCode] = useLocalStorage<string>(STORAGE_KEYS.LANGUAGE, 'en');
 
   const selectedLanguage = LANGUAGES.find((l) => l.code === selectedCode) ?? LANGUAGES[0];
 
-  const handleSelectLanguage = useCallback((language) => {
+  const handleSelectLanguage = useCallback((language: Language) => {
     setSelectedCode(language.code);
     setIsOpen(false);
     document.documentElement.lang = language.code;
 
     if (language.gtCode === 'en') {
       // Attempt to restore original — Google Translate uses a cookie
-      const restoreBtn = document.querySelector('.goog-te-restore, a.goog-logo-link');
+      const restoreBtn = document.querySelector('.goog-te-restore, a.goog-logo-link') as HTMLElement;
       if (restoreBtn) restoreBtn.click();
     } else {
       window.__setGoogleTranslateLang?.(language.gtCode);
@@ -75,7 +90,7 @@ function LanguageSwitcher() {
     setIsOpen((prev) => !prev);
   }, []);
 
-  const handleKeyDown = useCallback((event) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape') setIsOpen(false);
   }, []);
 
@@ -114,7 +129,7 @@ function LanguageSwitcher() {
               className={`lang-option${language.code === selectedLanguage.code ? ' active' : ''}`}
               role="option"
               aria-selected={language.code === selectedLanguage.code}
-              onClick={() => handleSelectLanguage(language)}
+              onClick={() => handleSelectLanguage(language as Language)}
             >
               <span className="lang-flag">{language.flag}</span>
               {language.label}
@@ -129,12 +144,12 @@ function LanguageSwitcher() {
       )}
     </div>
   );
-}
+};
 
 // ── Navigation Link ───────────────────────────────────────────────────────────
 
 /** A single navigation anchor that highlights when its section is active. */
-const NavLink = memo(function NavLink({ href, label, aria, sectionId, activeSection, onClick }) {
+const NavLink = memo(({ href, label, aria, sectionId, activeSection, onClick }: NavLinkProps) => {
   return (
     <li>
       <a
@@ -151,24 +166,19 @@ const NavLink = memo(function NavLink({ href, label, aria, sectionId, activeSect
 });
 
 NavLink.displayName = 'NavLink';
-NavLink.propTypes = {
-  href:          PropTypes.string.isRequired,
-  label:         PropTypes.string.isRequired,
-  aria:          PropTypes.string.isRequired,
-  sectionId:     PropTypes.string.isRequired,
-  activeSection: PropTypes.string.isRequired,
-  onClick:       PropTypes.func.isRequired,
-};
 
 // ── Navbar ────────────────────────────────────────────────────────────────────
 
 /** Primary navigation bar with language switcher, mobile menu, and active-section highlighting. */
-function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const activeSection = useActiveSection();
 
   const closeMenu = useCallback(() => setIsMenuOpen(false), []);
-  const toggleMenu = useCallback(() => setIsMenuOpen((prev) => !prev), []);
+  const toggleMenu = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setIsMenuOpen((prev) => !prev);
+  }, []);
 
   return (
     <nav role="navigation" aria-label={ARIA_LABELS.MAIN_NAV}>
@@ -199,7 +209,10 @@ function Navbar() {
           {NAV_LINKS.map((link) => (
             <NavLink
               key={link.href}
-              {...link}
+              href={link.href}
+              label={link.label}
+              aria={link.aria}
+              sectionId={link.sectionId}
               activeSection={activeSection}
               onClick={closeMenu}
             />
@@ -210,6 +223,4 @@ function Navbar() {
       </div>
     </nav>
   );
-}
-
-export { Navbar };
+};

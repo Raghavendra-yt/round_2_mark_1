@@ -1,10 +1,12 @@
-import React from 'react';
+interface LoadingSpinnerProps {
+  label?: string;
+}
 
 /**
  * Generic loading spinner used during Suspense fallbacks.
  * Announces the loading state to screen readers via aria-label.
  */
-function LoadingSpinner({ label = 'Loading…' }) {
+export const LoadingSpinner = ({ label = 'Loading…' }: LoadingSpinnerProps) => {
   return (
     <div
       className="loading-spinner-container"
@@ -16,6 +18,4 @@ function LoadingSpinner({ label = 'Loading…' }) {
       <span className="loading-spinner-text">{label}</span>
     </div>
   );
-}
-
-export { LoadingSpinner };
+};

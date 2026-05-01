@@ -1,5 +1,5 @@
 /** Call-to-action section encouraging civic participation. */
-function CTA() {
+export const CTA = () => {
   return (
     <section className="cta-section" aria-labelledby="cta-heading">
       <div className="cta-inner">
@@ -31,6 +31,4 @@ function CTA() {
       </div>
     </section>
   );
-}
-
-export { CTA };
+};

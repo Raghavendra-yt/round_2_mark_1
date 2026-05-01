@@ -7,23 +7,24 @@ import { INTERSECTION_THRESHOLD } from '../constants';
  *
  * @param {number} [threshold] - Intersection threshold (0–1).
  */
-export function useScrollReveal(threshold = INTERSECTION_THRESHOLD) {
-  const observerRef = useRef(null);
+export const useScrollReveal = (threshold: number = INTERSECTION_THRESHOLD): void => {
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const observe = useCallback(() => {
+  const observe = useCallback((): void => {
     const items = document.querySelectorAll('.reveal');
-    observerRef.current = new IntersectionObserver(
+    const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('visible');
-            observerRef.current?.unobserve(entry.target);
+            observer.unobserve(entry.target);
           }
         });
       },
       { threshold }
     );
-    items.forEach((element) => observerRef.current?.observe(element));
+    observerRef.current = observer;
+    items.forEach((element) => observer.observe(element));
   }, [threshold]);
 
   useEffect(() => {
@@ -32,4 +33,4 @@ export function useScrollReveal(threshold = INTERSECTION_THRESHOLD) {
       observerRef.current?.disconnect();
     };
   }, [observe]);
-}
+};

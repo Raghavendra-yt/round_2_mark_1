@@ -2,9 +2,9 @@ import { sanitizeHtml, sanitizeText, sanitizeUrl, sanitizeName } from './sanitiz
 
 describe('sanitizeHtml', () => {
   it('returns empty string for non-string input', () => {
-    expect(sanitizeHtml(null)).toBe('');
-    expect(sanitizeHtml(undefined)).toBe('');
-    expect(sanitizeHtml(42)).toBe('');
+    expect(sanitizeHtml(null as any)).toBe('');
+    expect(sanitizeHtml(undefined as any)).toBe('');
+    expect(sanitizeHtml(42 as any)).toBe('');
   });
 
   it('strips disallowed tags like <script>', () => {
@@ -32,8 +32,8 @@ describe('sanitizeText', () => {
   });
 
   it('returns empty string for non-strings', () => {
-    expect(sanitizeText(null)).toBe('');
-    expect(sanitizeText(undefined)).toBe('');
+    expect(sanitizeText(null as any)).toBe('');
+    expect(sanitizeText(undefined as any)).toBe('');
   });
 
   it('preserves plain text content', () => {
@@ -55,7 +55,7 @@ describe('sanitizeUrl', () => {
   it('returns null for invalid URLs', () => {
     expect(sanitizeUrl('not-a-url')).toBeNull();
     expect(sanitizeUrl('')).toBeNull();
-    expect(sanitizeUrl(null)).toBeNull();
+    expect(sanitizeUrl(null as any)).toBeNull();
   });
 });
 
@@ -75,8 +75,8 @@ describe('sanitizeName', () => {
   });
 
   it('returns empty string for non-strings', () => {
-    expect(sanitizeName(null)).toBe('');
-    expect(sanitizeName(undefined)).toBe('');
+    expect(sanitizeName(null as any)).toBe('');
+    expect(sanitizeName(undefined as any)).toBe('');
   });
 
   it('trims whitespace', () => {

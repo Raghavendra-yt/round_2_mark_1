@@ -1,5 +1,4 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Quiz } from './Quiz';
 
@@ -9,14 +8,14 @@ describe('Quiz Component Integration', () => {
     render(<Quiz />);
 
     // Wait for questions to load
-    const heading = await screen.findByRole('heading', { name: /Test Your Knowledge/i });
+    const heading = await screen.findByRole('heading', { name: /Test What You've Learned/i });
     expect(heading).toBeInTheDocument();
 
     // Select first answer
-    const answerButton = screen.getAllByRole('button')[1]; // Assume the first button after start/nav is an answer
+    const answerButton = screen.getAllByRole('radio')[0]; 
     await user.click(answerButton);
 
     // Verify feedback is visible
-    expect(screen.getByText(/Explanation/i)).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 });

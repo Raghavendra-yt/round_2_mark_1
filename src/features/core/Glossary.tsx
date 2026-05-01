@@ -1,25 +1,41 @@
-import { useState, useCallback, useMemo } from 'react';
-import { glossaryTerms } from '../data/content';
-import { useDebounce } from '../hooks/useDebounce';
-import { SEARCH_DEBOUNCE_MS } from '../constants';
-import { sanitizeText } from '../utils/sanitize';
+import { useState, useCallback, useMemo, ChangeEvent, memo } from 'react';
+import { glossaryTerms } from '@/data/content';
+import { useDebounce } from '@/hooks/useDebounce';
+import { SEARCH_DEBOUNCE_MS } from '@/constants';
+import { sanitizeText } from '@/utils/sanitize';
+
+interface GlossaryItemData {
+  term: string;
+  def: string;
+}
+
+/** Individual glossary term card, memoized for performance. */
+const GlossaryCard = memo(({ item }: { item: GlossaryItemData }) => (
+  <article className="glossary-card reveal" role="listitem">
+    <div className="glossary-term">{item.term}</div>
+    <div className="glossary-def">{item.def}</div>
+  </article>
+));
+
+GlossaryCard.displayName = 'GlossaryCard';
 
 /**
  * Searchable election glossary section.
  * Uses a debounced search input to filter terms without excessive re-renders.
  */
-function Glossary() {
-  const [searchQuery, setSearchQuery] = useState('');
+export const Glossary = () => {
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const debouncedQuery = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
 
-  const handleSearchChange = useCallback((event) => {
+  const handleSearchChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(sanitizeText(event.target.value));
   }, []);
 
   const filteredTerms = useMemo(() => {
     const normalised = debouncedQuery.toLowerCase().trim();
-    if (!normalised) return glossaryTerms;
-    return glossaryTerms.filter(
+    const allTerms = glossaryTerms as GlossaryItemData[];
+    if (!normalised) return allTerms;
+    return allTerms.filter(
       (item) =>
         item.term.toLowerCase().includes(normalised) ||
         item.def.toLowerCase().includes(normalised)
@@ -62,10 +78,7 @@ function Glossary() {
         >
           {filteredTerms.length > 0 ? (
             filteredTerms.map((item) => (
-              <article key={item.term} className="glossary-card reveal" role="listitem">
-                <div className="glossary-term">{item.term}</div>
-                <div className="glossary-def">{item.def}</div>
-              </article>
+              <GlossaryCard key={item.term} item={item} />
             ))
           ) : (
             <p className="glossary-empty">No terms match your search.</p>
@@ -74,6 +87,4 @@ function Glossary() {
       </div>
     </section>
   );
-}
-
-export { Glossary };
+};

@@ -1,23 +1,25 @@
 import { POLL_OFFSETS } from '../constants';
 import { haversineKm, estimateDriveMinutes, estimateWalkMinutes } from '../utils/geo';
 
+export interface PollingStation {
+  id: string;
+  name: string;
+  type: string;
+  lat: number;
+  lng: number;
+  distanceKm: number;
+  driveMinutes: number;
+  walkMinutes: number;
+}
+
 /**
  * Builds mock polling station data relative to the user's position.
  * Stations are sorted nearest-first.
  *
  * @param {{ lat: number, lng: number }} userPosition
- * @returns {Array<{
- *   id: string,
- *   name: string,
- *   type: string,
- *   lat: number,
- *   lng: number,
- *   distanceKm: number,
- *   driveMinutes: number,
- *   walkMinutes: number,
- * }>} Sorted station list.
+ * @returns {PollingStation[]} Sorted station list.
  */
-export function buildPollingStations(userPosition) {
+export const buildPollingStations = (userPosition: { lat: number; lng: number }): PollingStation[] => {
   const { lat, lng } = userPosition;
 
   return POLL_OFFSETS.map((offset) => {
@@ -26,14 +28,14 @@ export function buildPollingStations(userPosition) {
     const distanceKm = haversineKm(lat, lng, stationLat, stationLng);
 
     return {
-      id:           offset.id,
-      name:         offset.name,
-      type:         offset.type,
-      lat:          stationLat,
-      lng:          stationLng,
+      id: offset.id,
+      name: offset.name,
+      type: offset.type,
+      lat: stationLat,
+      lng: stationLng,
       distanceKm,
       driveMinutes: estimateDriveMinutes(distanceKm),
-      walkMinutes:  estimateWalkMinutes(distanceKm),
+      walkMinutes: estimateWalkMinutes(distanceKm),
     };
   }).sort((a, b) => a.distanceKm - b.distanceKm);
-}
+};

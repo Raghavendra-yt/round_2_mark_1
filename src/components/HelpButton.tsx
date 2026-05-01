@@ -1,17 +1,31 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import PropTypes from 'prop-types';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
-const HELP_OPTIONS = [
-  { id: 'police',    className: 'hi-police',    icon: '🚔', label: 'Call Police',      sub: 'Emergency: 911',          number: '911' },
-  { id: 'emergency', className: 'hi-emergency', icon: '🚨', label: 'Emergency',        sub: 'General emergency line',  number: '911' },
-  { id: 'medical',   className: 'hi-medical',   icon: '🏥', label: 'Medical Support',  sub: 'Ambulance: 911',          number: '911' },
-  { id: 'ambulance', className: 'hi-ambulance', icon: '🚑', label: 'Ambulance',        sub: 'EMS dispatch',            number: '911' },
-  { id: 'fire',      className: 'hi-fire',       icon: '🔥', label: 'Fire Department', sub: 'Fire emergency: 911',     number: '911' },
-  { id: 'sos',       className: 'hi-sos',        icon: '🆘', label: 'SOS',             sub: 'International distress',  number: '112' },
+interface HelpOptionData {
+  id: string;
+  className: string;
+  icon: string;
+  label: string;
+  sub: string;
+  number: string;
+}
+
+interface HelpOptionProps {
+  option: HelpOptionData;
+  onSelect: (option: HelpOptionData) => void;
+}
+
+const HELP_OPTIONS: HelpOptionData[] = [
+  { id: 'police', className: 'hi-police', icon: '🚔', label: 'Call Police', sub: 'Emergency: 911', number: '911' },
+  { id: 'emergency', className: 'hi-emergency', icon: '🚨', label: 'Emergency', sub: 'General emergency line', number: '911' },
+  { id: 'medical', className: 'hi-medical', icon: '🏥', label: 'Medical Support', sub: 'Ambulance: 911', number: '911' },
+  { id: 'ambulance', className: 'hi-ambulance', icon: '🚑', label: 'Ambulance', sub: 'EMS dispatch', number: '911' },
+  { id: 'fire', className: 'hi-fire', icon: '🔥', label: 'Fire Department', sub: 'Fire emergency: 911', number: '911' },
+  { id: 'sos', className: 'hi-sos', icon: '🆘', label: 'SOS', sub: 'International distress', number: '112' },
 ];
 
 /** Single emergency option in the help menu. */
-const HelpOption = memo(function HelpOption({ option, onSelect }) {
+const HelpOption = memo(({ option, onSelect }: HelpOptionProps) => {
   return (
     <button
       className={`help-item ${option.className}`}
@@ -28,31 +42,23 @@ const HelpOption = memo(function HelpOption({ option, onSelect }) {
 });
 
 HelpOption.displayName = 'HelpOption';
-HelpOption.propTypes = {
-  option: PropTypes.shape({
-    id:        PropTypes.string.isRequired,
-    className: PropTypes.string.isRequired,
-    icon:      PropTypes.string.isRequired,
-    label:     PropTypes.string.isRequired,
-    sub:       PropTypes.string.isRequired,
-    number:    PropTypes.string.isRequired,
-  }).isRequired,
-  onSelect: PropTypes.func.isRequired,
-};
 
 /** Floating emergency help button (SOS) with expandable quick-dial menu. */
-function HelpButton() {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef(null);
+export const HelpButton = () => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  // Trap focus when open
+  useFocusTrap(containerRef, isOpen);
 
   // Close when clicking outside or pressing Escape
   useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-    const handleEscape = (event) => {
+    const handleEscape = (event: globalThis.KeyboardEvent) => {
       if (event.key === 'Escape') setIsOpen(false);
     };
     document.addEventListener('mousedown', handleOutsideClick);
@@ -63,7 +69,7 @@ function HelpButton() {
     };
   }, []);
 
-  const handleCall = useCallback((option) => {
+  const handleCall = useCallback((option: HelpOptionData) => {
     window.location.href = `tel:${option.number}`;
     setIsOpen(false);
   }, []);
@@ -85,9 +91,9 @@ function HelpButton() {
           className="help-menu"
           role="dialog"
           aria-label="Emergency options"
-          aria-modal="false"
+          aria-modal="true"
         >
-          <div className="help-menu-title">🆘 Emergency Help</div>
+          <div className="help-menu-title" aria-live="polite">🆘 Emergency Help Options</div>
           {HELP_OPTIONS.map((option) => (
             <HelpOption key={option.id} option={option} onSelect={handleCall} />
           ))}
@@ -107,6 +113,4 @@ function HelpButton() {
       </button>
     </div>
   );
-}
-
-export { HelpButton };
+};

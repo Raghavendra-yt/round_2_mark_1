@@ -3,7 +3,7 @@ import { LoadingSpinner } from './LoadingSpinner';
 
 describe('LoadingSpinner Component', () => {
   it('renders accessible loading text', () => {
-    render(<LoadingSpinner message="Loading content..." />);
+    render(<LoadingSpinner label="Loading content..." />);
     
     const spinnerRegion = screen.getByRole('status');
     expect(spinnerRegion).toBeInTheDocument();
@@ -13,6 +13,6 @@ describe('LoadingSpinner Component', () => {
 
   it('uses default message when no prop provided', () => {
     render(<LoadingSpinner />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Loading…')).toBeInTheDocument();
   });
 });

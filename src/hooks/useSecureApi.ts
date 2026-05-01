@@ -10,8 +10,8 @@ interface FetchOptions extends RequestInit {
  * Automatically injects authorization tokens, sanitizes responses, 
  * and standardizes error handling.
  */
-export function useSecureApi() {
-  const [loading, setLoading] = useState(false);
+export const useSecureApi = () => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchSecure = useCallback(async <T>(url: string, options: FetchOptions = {}): Promise<T | null> => {
@@ -48,13 +48,12 @@ export function useSecureApi() {
 
       // 3. XSS Sanitization (Deep traverse and sanitize string fields if needed)
       // For demonstration, stringifying and sanitizing the whole payload, then parsing.
-      // This is a heavy-handed approach; usually, you sanitize specific fields during rendering.
       const sanitizedString = DOMPurify.sanitize(JSON.stringify(rawData));
       const safeData = JSON.parse(sanitizedString) as T;
 
       return safeData;
-    } catch (err: any) {
-      setError(err.message || 'An unknown network error occurred.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An unknown network error occurred.');
       return null;
     } finally {
       setLoading(false);
@@ -62,4 +61,4 @@ export function useSecureApi() {
   }, []);
 
   return { fetchSecure, loading, error };
-}
+};

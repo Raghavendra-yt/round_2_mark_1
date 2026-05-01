@@ -7,9 +7,9 @@ import { useState } from 'react';
  * @template T
  * @param {string} key - The localStorage key.
  * @param {T} initialValue - The initial value if no data exists.
- * @returns {[T, (value: T | ((val: T) => T)) => void]} The state and setter tuple.
+ * @returns {[T, (value: T | ((v: T) => T)) => void]} The state and setter tuple.
  */
-export function useLocalStorage<T>(key: string, initialValue: T) {
+export const useLocalStorage = <T>(key: string, initialValue: T): readonly [T, (value: T | ((_v: T) => T)) => void] => {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const item = window.localStorage.getItem(key);
@@ -20,7 +20,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   });
 
-  const setValue = (value: T | ((val: T) => T)) => {
+  const setValue = (value: T | ((v: T) => T)) => {
     try {
       const valueToStore = value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
@@ -31,4 +31,4 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   };
 
   return [storedValue, setValue] as const;
-}
+};

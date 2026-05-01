@@ -1,10 +1,29 @@
-import { useState, useRef, useCallback, memo } from 'react';
-import PropTypes from 'prop-types';
-import { phases } from '../data/phases';
+import { useState, useRef, memo, useCallback, KeyboardEvent, RefObject } from 'react';
+import { phases } from '@/data/phases';
+
+interface Phase {
+  icon: string;
+  title: string;
+  short: string;
+  detail: string;
+  tags: string[];
+}
+
+interface TimelineItemProps {
+  phase: Phase;
+  index: number;
+  isActive: boolean;
+  onSelect: (index: number) => void;
+}
+
+interface PhasePanelProps {
+  phase: Phase;
+  panelRef: RefObject<HTMLDivElement>;
+}
 
 /** A single election phase row in the timeline list. */
-const TimelineItem = memo(function TimelineItem({ phase, index, isActive, onSelect }) {
-  const handleKeyDown = useCallback((event) => {
+const TimelineItem = memo(({ phase, index, isActive, onSelect }: TimelineItemProps) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       onSelect(index);
@@ -41,18 +60,9 @@ const TimelineItem = memo(function TimelineItem({ phase, index, isActive, onSele
 });
 
 TimelineItem.displayName = 'TimelineItem';
-TimelineItem.propTypes = {
-  phase: PropTypes.shape({
-    title: PropTypes.string.isRequired,
-    short: PropTypes.string.isRequired,
-  }).isRequired,
-  index:    PropTypes.number.isRequired,
-  isActive: PropTypes.bool.isRequired,
-  onSelect: PropTypes.func.isRequired,
-};
 
 /** Detail panel for the currently selected election phase. */
-const PhasePanel = memo(function PhasePanel({ phase, panelRef }) {
+const PhasePanel = memo(({ phase, panelRef }: PhasePanelProps) => {
   return (
     <div
       className="tl-panel reveal"
@@ -76,27 +86,18 @@ const PhasePanel = memo(function PhasePanel({ phase, panelRef }) {
 });
 
 PhasePanel.displayName = 'PhasePanel';
-PhasePanel.propTypes = {
-  phase: PropTypes.shape({
-    icon:   PropTypes.string.isRequired,
-    title:  PropTypes.string.isRequired,
-    detail: PropTypes.string.isRequired,
-    tags:   PropTypes.arrayOf(PropTypes.string).isRequired,
-  }).isRequired,
-  panelRef: PropTypes.object.isRequired,
-};
 
 /** Interactive election timeline — select a phase to view details. */
-function Timeline() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const panelRef = useRef(null);
+export const Timeline = () => {
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  const handleSelect = useCallback((index) => {
+  const handleSelect = useCallback((index: number) => {
     setActiveIndex(index);
     panelRef.current?.focus();
   }, []);
 
-  const activePhase = phases[activeIndex];
+  const activePhase = phases[activeIndex] as Phase;
 
   return (
     <section id="timeline" aria-labelledby="tl-heading">
@@ -120,7 +121,7 @@ function Timeline() {
             {phases.map((phase, index) => (
               <TimelineItem
                 key={phase.title}
-                phase={phase}
+                phase={phase as Phase}
                 index={index}
                 isActive={index === activeIndex}
                 onSelect={handleSelect}
@@ -133,6 +134,4 @@ function Timeline() {
       </div>
     </section>
   );
-}
-
-export { Timeline };
+};
