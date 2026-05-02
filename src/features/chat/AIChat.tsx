@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, memo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, memo, ChangeEvent, KeyboardEvent } from 'react';
 import DOMPurify from 'dompurify';
 
 /**
@@ -18,9 +18,9 @@ interface ChatMessage {
  * 
  * @component
  */
-export const AIChat = memo(() => {
+export const AIChat: React.FC = memo(() => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   /**
@@ -36,12 +36,12 @@ export const AIChat = memo(() => {
    * Processes and sends the user message.
    * Sanitizes input using DOMPurify before adding to state.
    */
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback((): void => {
     const trimmedInput = input.trim();
     if (!trimmedInput) return;
 
     // Sanitize input
-    const sanitizedInput = DOMPurify.sanitize(trimmedInput);
+    const sanitizedInput = DOMPurify.sanitize(trimmedInput) as string;
     
     setMessages(prev => [...prev, { role: 'user', text: sanitizedInput }]);
     setInput('');
@@ -57,9 +57,8 @@ export const AIChat = memo(() => {
 
   /**
    * Handles keyboard events for the input field.
-   * @param {React.KeyboardEvent} e - The keyboard event.
    */
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
       handleSend();
     }
@@ -67,9 +66,8 @@ export const AIChat = memo(() => {
 
   /**
    * Handles input change events.
-   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event.
    */
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>): void => {
     setInput(e.target.value);
   }, []);
 
