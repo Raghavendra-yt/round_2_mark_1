@@ -11,7 +11,7 @@ import { WeatherCard } from './components/WeatherCard';
 import { StationList } from './components/StationList';
 import { TripCard } from './components/TripCard';
 import { MapPlaceholder } from './components/MapPlaceholder';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { WeatherData, Station } from './types';
 
 /** Interactive section: locates user, shows weather, and renders nearby polling stations. */

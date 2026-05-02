@@ -64,7 +64,7 @@ export const SaveScoreModal = ({ score, total, onClose }: SaveScoreModalProps) =
         <div className="save-success" aria-live="polite">
           <span style={{ fontSize: '2rem' }} aria-hidden="true">✅</span>
           <p id="save-score-title" style={{ marginTop: '0.5rem', fontWeight: 600 }}>Score saved to leaderboard!</p>
-          <button className="btn-outline" style={{ marginTop: '1rem' }} onClick={onClose} autoFocus>
+          <button className="btn-outline" style={{ marginTop: '1rem' }} onClick={onClose}>
             Close
           </button>
         </div>

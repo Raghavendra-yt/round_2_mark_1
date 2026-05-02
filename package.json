@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint src --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test:unit": "jest",
     "test:coverage": "jest --coverage",
@@ -23,6 +23,7 @@
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.28.0",
     "react-window": "^1.8.11",
+    "zod": "^4.4.2",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

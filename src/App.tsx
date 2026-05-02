@@ -7,7 +7,7 @@ import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { HelpButton } from './components/HelpButton';
 import { ARIA_LABELS, APP_NAME, SKIP_LINK_TARGET } from './constants';
-import { ErrorBoundary } from './components/ErrorBoundary';
+import ErrorBoundary from './components/ErrorBoundary';
 import { LoadingSpinner } from './components/LoadingSpinner';
 
 // Route-level code splitting with React.lazy

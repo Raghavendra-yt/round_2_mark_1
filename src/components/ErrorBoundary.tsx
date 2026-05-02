@@ -2,6 +2,8 @@ import React, { ErrorInfo } from 'react';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
+  fallback?: React.ReactNode;
+  componentName?: string;
 }
 
 interface ErrorBoundaryState {
@@ -23,14 +25,18 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error(`ErrorBoundary caught an error in ${this.props.componentName || 'Unknown'}:`, error, errorInfo);
   }
 
   public render(): React.ReactNode {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
       return (
         <div className="error-boundary-fallback" role="alert" style={{ padding: '2rem', textAlign: 'center' }}>
-          <h2>Something went wrong.</h2>
+          <h2>Something went wrong{this.props.componentName ? ` in ${this.props.componentName}` : ''}.</h2>
           <p>{this.state.errorMessage}</p>
           <button 
             className="btn-primary" 

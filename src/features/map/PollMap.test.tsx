@@ -1,4 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+
 import { PollMap } from './PollMap';
 import * as geolocationHook from '@/hooks/useGeolocation';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

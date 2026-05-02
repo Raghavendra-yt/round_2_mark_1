@@ -1,11 +1,10 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 /**
  * Performance-optimized hook for Gemini API calls.
  * Implements React Query for caching and stale-while-revalidate strategy.
  */
 export const useGeminiQuery = (prompt: string, options = {}) => {
-  const queryClient = useQueryClient();
 
   return useQuery({
     queryKey: ['gemini', prompt],

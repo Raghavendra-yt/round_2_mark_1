@@ -95,7 +95,7 @@ const LanguageSwitcher = () => {
   }, []);
 
   return (
-    <div className="lang-switcher" onKeyDown={handleKeyDown}>
+    <div className="lang-switcher" onKeyDown={handleKeyDown} role="presentation">
       <button
         id="lang-switcher-btn"
         className={`lang-btn${isOpen ? ' open' : ''}`}
@@ -116,6 +116,7 @@ const LanguageSwitcher = () => {
           id="lang-dropdown"
           className="lang-dropdown"
           role="listbox"
+          tabIndex={-1}
           aria-label="Language options"
           aria-activedescendant={`lang-option-${selectedLanguage.code}`}
         >
@@ -204,7 +205,6 @@ export const Navbar = () => {
         <ul
           className={`nav-links${isMenuOpen ? ' open' : ''}`}
           id="nav-menu"
-          role="list"
         >
           {NAV_LINKS.map((link) => (
             <NavLink

@@ -30,7 +30,6 @@ export const AIChat = () => {
     <section 
       className="ai-chat" 
       aria-labelledby="chat-heading"
-      role="region"
     >
       <h2 id="chat-heading" className="sr-only">AI Civic Assistant</h2>
       
@@ -40,7 +39,6 @@ export const AIChat = () => {
         aria-live="polite" 
         aria-relevant="additions"
         ref={scrollRef}
-        tabIndex={0}
         aria-label="Chat message history"
       >
         {messages.map((msg, i) => (

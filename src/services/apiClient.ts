@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 
-const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 
 /**
  * Global Systems Integrator Wrapper for API calls.
