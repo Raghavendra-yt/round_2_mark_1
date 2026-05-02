@@ -3,10 +3,21 @@ import { logEvent } from 'firebase/analytics';
 import { analytics, isFirebaseConfigured } from '@/firebase';
 
 /**
- * Hook to handle Google Analytics tracking.
- * Provides a unified interface for logging events and handles route tracking.
+ * Interface representing the return value of the useAnalytics hook.
  */
-export const useAnalytics = (activeSection?: string) => {
+interface UseAnalyticsReturn {
+  trackEvent: (eventName: string, params?: Record<string, any>) => void;
+  trackError: (message: string, componentName: string) => void;
+}
+
+/**
+ * Hook to handle Google Analytics tracking.
+ * Provides a unified interface for logging events and handles section-based route tracking.
+ * 
+ * @param {string} [activeSection] - The currently visible section ID to track as a page view.
+ * @returns {UseAnalyticsReturn} Unified analytics tracking functions.
+ */
+export const useAnalytics = (activeSection?: string): UseAnalyticsReturn => {
   // Track "page views" when the active section changes (for our single-page app)
   useEffect(() => {
     if (isFirebaseConfigured && analytics && activeSection) {
@@ -17,13 +28,19 @@ export const useAnalytics = (activeSection?: string) => {
     }
   }, [activeSection]);
 
-  const trackEvent = (eventName: string, params?: Record<string, any>) => {
+  /**
+   * Logs a custom event to Firebase Analytics.
+   */
+  const trackEvent = (eventName: string, params?: Record<string, any>): void => {
     if (isFirebaseConfigured && analytics) {
       logEvent(analytics, eventName, params);
     }
   };
 
-  const trackError = (message: string, componentName: string) => {
+  /**
+   * Logs an application error as an analytics event.
+   */
+  const trackError = (message: string, componentName: string): void => {
     trackEvent('app_error', {
       error_message: message,
       component_name: componentName,

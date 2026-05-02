@@ -1,5 +1,4 @@
-import { memo, useMemo, ReactNode } from 'react';
-import PropTypes from 'prop-types';
+import React, { memo, useMemo, ReactNode } from 'react';
 
 /**
  * Props for the individual StatItem component.
@@ -38,7 +37,7 @@ const STATS_DATA: StatItemProps[] = [
  * 
  * @component
  */
-const StatItem = memo(({ value, label, aria }: StatItemProps) => {
+const StatItem: React.FC<StatItemProps> = memo(({ value, label, aria }) => {
   return (
     <div className="stat-item reveal" role="listitem">
       <div className="stat-num" aria-label={aria}>{value}</div>
@@ -49,19 +48,13 @@ const StatItem = memo(({ value, label, aria }: StatItemProps) => {
 
 StatItem.displayName = 'StatItem';
 
-StatItem.propTypes = {
-  value: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  aria: PropTypes.string.isRequired,
-};
-
 /** 
  * Container component for stats items.
  * Implements the compound component pattern.
  * 
  * @component
  */
-const StatsContainer = memo(({ children, ariaLabel = "Key statistics about ElectED" }: StatsProps) => {
+const StatsContainer: React.FC<StatsProps> = memo(({ children, ariaLabel = "Key statistics about ElectED" }) => {
   return (
     <div className="stats" role="list" aria-label={ariaLabel}>
       {children}
@@ -70,11 +63,6 @@ const StatsContainer = memo(({ children, ariaLabel = "Key statistics about Elect
 });
 
 StatsContainer.displayName = 'StatsContainer';
-
-StatsContainer.propTypes = {
-  children: PropTypes.node.isRequired,
-  ariaLabel: PropTypes.string,
-};
 
 /**
  * Combined Stats component using the Compound Component Pattern.
@@ -89,7 +77,7 @@ const Stats = Object.assign(StatsContainer, {
  * 
  * @component
  */
-export const StatsSection = memo(() => {
+export const StatsSection: React.FC = memo(() => {
   const stats = useMemo(() => STATS_DATA, []);
 
   return (

@@ -1,12 +1,24 @@
+/**
+ * Global constants for the ElectED application.
+ * Centralized configuration for branding, navigation, mapping, and external APIs.
+ */
+
 // ── App Metadata ─────────────────────────────────────────────────────────────
-export const APP_NAME = 'ElectED';
-export const APP_TAGLINE = 'Election Process Education';
-export const APP_DESCRIPTION =
+export const APP_NAME: string = 'ElectED';
+export const APP_TAGLINE: string = 'Election Process Education';
+export const APP_DESCRIPTION: string =
   'A comprehensive, accessible, non-partisan guide to how elections work — from candidacy declaration to official certification.';
-export const APP_VERSION = '2.0.0';
+export const APP_VERSION: string = '2.0.0';
 
 // ── Navigation ────────────────────────────────────────────────────────────────
-export const NAV_LINKS = [
+interface NavLink {
+  href: string;
+  label: string;
+  aria: string;
+  sectionId: string;
+}
+
+export const NAV_LINKS: NavLink[] = [
   { href: '#hero',     label: 'Home',       aria: 'Home section',                  sectionId: 'hero' },
   { href: '#timeline', label: 'Timeline',   aria: 'Election Timeline section',     sectionId: 'timeline' },
   { href: '#how',      label: 'Steps',      aria: 'How it Works section',          sectionId: 'how' },
@@ -15,10 +27,17 @@ export const NAV_LINKS = [
   { href: '#glossary', label: 'Glossary',   aria: 'Election Glossary section',     sectionId: 'glossary' },
 ];
 
-export const SECTION_IDS = NAV_LINKS.map((l) => l.sectionId);
+export const SECTION_IDS: string[] = NAV_LINKS.map((l) => l.sectionId);
 
 // ── Language Options ──────────────────────────────────────────────────────────
-export const LANGUAGES = [
+interface Language {
+  code: string;
+  gtCode: string;
+  label: string;
+  flag: string;
+}
+
+export const LANGUAGES: Language[] = [
   { code: 'en', gtCode: 'en',    label: 'English',   flag: '🇺🇸' },
   { code: 'es', gtCode: 'es',    label: 'Español',   flag: '🇪🇸' },
   { code: 'fr', gtCode: 'fr',    label: 'Français',  flag: '🇫🇷' },
@@ -32,11 +51,18 @@ export const LANGUAGES = [
 ];
 
 // ── Map Config ────────────────────────────────────────────────────────────────
-export const MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? '';
-export const MAPS_CONFIGURED =
+export const MAPS_API_KEY: string = import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? '';
+export const MAPS_CONFIGURED: boolean =
   Boolean(MAPS_API_KEY) && !MAPS_API_KEY.includes('YOUR_');
 
-export const POLL_OFFSETS = [
+interface PollOffset {
+  name: string;
+  delta: [number, number];
+  type: string;
+  id: string;
+}
+
+export const POLL_OFFSETS: PollOffset[] = [
   { name: 'City Hall',             delta: [0.006,  0.008],  type: 'Main Station',   id: 'p1' },
   { name: 'Community Center',      delta: [-0.009, 0.004],  type: 'Secondary',      id: 'p2' },
   { name: 'Public Library',        delta: [0.004, -0.010],  type: 'Early Voting',   id: 'p3' },
@@ -44,7 +70,7 @@ export const POLL_OFFSETS = [
   { name: 'Greenway Rec Center',   delta: [0.010,  0.002],  type: 'Accessible Site',id: 'p5' },
 ];
 
-export const MAP_STYLES = [
+export const MAP_STYLES: google.maps.MapTypeStyle[] = [
   { featureType: 'poi',           elementType: 'labels',   stylers: [{ visibility: 'off' }] },
   { featureType: 'transit',                                stylers: [{ visibility: 'simplified' }] },
   { featureType: 'water',         elementType: 'geometry', stylers: [{ color: '#d4e8f5' }] },
@@ -54,7 +80,12 @@ export const MAP_STYLES = [
 ];
 
 // ── Weather Codes ─────────────────────────────────────────────────────────────
-export const WEATHER_CODE_MAP = {
+interface WeatherInfo {
+  label: string;
+  icon: string;
+}
+
+export const WEATHER_CODE_MAP: Record<number, WeatherInfo> = {
   0:  { label: 'Clear Sky',        icon: '☀️' },
   1:  { label: 'Mainly Clear',     icon: '🌤️' },
   2:  { label: 'Partly Cloudy',    icon: '⛅' },
@@ -79,36 +110,36 @@ export const WEATHER_CODE_MAP = {
 };
 
 // ── Quiz Config ───────────────────────────────────────────────────────────────
-export const QUIZ_LETTERS = ['A', 'B', 'C', 'D'];
-export const QUIZ_LEADERBOARD_LIMIT = 5;
+export const QUIZ_LETTERS: string[] = ['A', 'B', 'C', 'D'];
+export const QUIZ_LEADERBOARD_LIMIT: number = 5;
 
-export const QUIZ_MESSAGES = {
+export const QUIZ_MESSAGES: Record<string, string> = {
   perfect: 'Outstanding! You have a strong understanding of the election process.',
   great:   'Great job! Review the timeline section to strengthen any gaps.',
   keep:    'No worries — revisit the guide above and try again.',
 };
 
-export const QUIZ_TITLES = {
+export const QUIZ_TITLES: Record<string, string> = {
   perfect: 'Perfect Score!',
   great:   'Well Done!',
   keep:    'Keep Learning!',
 };
 
 // ── API Endpoints ─────────────────────────────────────────────────────────────
-export const WEATHER_API_BASE = 'https://api.open-meteo.com/v1/forecast';
-export const GEOCODE_API_BASE = 'https://nominatim.openstreetmap.org/reverse';
+export const WEATHER_API_BASE: string = 'https://api.open-meteo.com/v1/forecast';
+export const GEOCODE_API_BASE: string = 'https://nominatim.openstreetmap.org/reverse';
 
 // ── Accessibility ─────────────────────────────────────────────────────────────
-export const SKIP_LINK_TARGET = 'main-content';
-export const INTERSECTION_THRESHOLD = 0.12;
-export const SCROLL_DEBOUNCE_MS = 150;
-export const SEARCH_DEBOUNCE_MS = 300;
+export const SKIP_LINK_TARGET: string = 'main-content';
+export const INTERSECTION_THRESHOLD: number = 0.12;
+export const SCROLL_DEBOUNCE_MS: number = 150;
+export const SEARCH_DEBOUNCE_MS: number = 300;
 
 // ── Local Storage Keys ────────────────────────────────────────────────────────
 export const STORAGE_KEYS = {
   THEME:    'elected_theme',
   LANGUAGE: 'elected_language',
-};
+} as const;
 
 // ── ARIA Labels ───────────────────────────────────────────────────────────────
 export const ARIA_LABELS = {
@@ -119,4 +150,4 @@ export const ARIA_LABELS = {
   QUIZ_REGION:  'Election knowledge quiz',
   QUIZ_PROGRESS:'Quiz progress',
   POLL_MAP:     'Google Map showing polling stations',
-};
+} as const;

@@ -1,11 +1,10 @@
-import { useState, useRef, memo, useCallback, KeyboardEvent, RefObject } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useRef, memo, useCallback, KeyboardEvent, RefObject } from 'react';
 import { phases } from '@/data/phases';
 
 /**
  * Election Phase data structure.
  */
-interface Phase {
+export interface Phase {
   /** Emoji or icon representation. */
   icon: string;
   /** Primary title of the phase. */
@@ -48,12 +47,11 @@ interface PhasePanelProps {
  * 
  * @component
  */
-const TimelineItem = memo(({ phase, index, isActive, onSelect }: TimelineItemProps) => {
+const TimelineItem: React.FC<TimelineItemProps> = memo(({ phase, index, isActive, onSelect }) => {
   /**
    * Handles keyboard interaction for accessibility.
-   * @param {KeyboardEvent<HTMLDivElement>} event - The keyboard event.
    */
-  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>): void => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       onSelect(index);
@@ -69,7 +67,7 @@ const TimelineItem = memo(({ phase, index, isActive, onSelect }: TimelineItemPro
   }, [index, onSelect]);
 
   /** Handles click events. */
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((): void => {
     onSelect(index);
   }, [index, onSelect]);
 
@@ -96,26 +94,13 @@ const TimelineItem = memo(({ phase, index, isActive, onSelect }: TimelineItemPro
 
 TimelineItem.displayName = 'TimelineItem';
 
-TimelineItem.propTypes = {
-  phase: PropTypes.shape({
-    icon: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    short: PropTypes.string.isRequired,
-    detail: PropTypes.string.isRequired,
-    tags: PropTypes.arrayOf(PropTypes.string).isRequired,
-  }).isRequired,
-  index: PropTypes.number.isRequired,
-  isActive: PropTypes.bool.isRequired,
-  onSelect: PropTypes.func.isRequired,
-};
-
 /** 
  * Detail panel for the currently selected election phase.
  * Announces changes to screen readers via aria-live.
  * 
  * @component
  */
-const PhasePanel = memo(({ phase, panelRef }: PhasePanelProps) => {
+const PhasePanel: React.FC<PhasePanelProps> = memo(({ phase, panelRef }) => {
   return (
     <div
       className="tl-panel reveal"
@@ -140,37 +125,24 @@ const PhasePanel = memo(({ phase, panelRef }: PhasePanelProps) => {
 
 PhasePanel.displayName = 'PhasePanel';
 
-PhasePanel.propTypes = {
-  phase: PropTypes.shape({
-    icon: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    short: PropTypes.string.isRequired,
-    detail: PropTypes.string.isRequired,
-    tags: PropTypes.arrayOf(PropTypes.string).isRequired,
-  }).isRequired,
-  panelRef: PropTypes.oneOfType([
-    PropTypes.func, 
-    PropTypes.shape({ current: PropTypes.instanceOf(Element) })
-  ]).isRequired,
-};
-
 /** 
  * Interactive election timeline — select a phase to view details.
  * Coordinates state between the timeline list and the detail panel.
  * 
  * @component
  */
-export const Timeline = memo(() => {
+export const Timeline: React.FC = memo(() => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const panelRef = useRef<HTMLDivElement>(null);
 
   /**
    * Updates the active phase and moves focus to the detail panel.
-   * @param {number} index - The index of the selected phase.
    */
-  const handleSelect = useCallback((index: number) => {
+  const handleSelect = useCallback((index: number): void => {
     setActiveIndex(index);
-    panelRef.current?.focus();
+    if (panelRef.current) {
+      panelRef.current.focus();
+    }
   }, []);
 
   const activePhase = phases[activeIndex] as Phase;

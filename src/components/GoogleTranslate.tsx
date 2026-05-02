@@ -1,16 +1,18 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 /**
  * Initialises the Google Translate widget in a hidden container.
  * Exposes `window.__setGoogleTranslateLang(code)` for programmatic language switching.
  *
  * Renders no visible UI — the widget lives in a hidden container that our
- * custom LanguageSwitcher in Navbar.jsx proxies into.
+ * custom LanguageSwitcher in Navbar proxies into.
+ * 
+ * @component
  */
-export const GoogleTranslateInit = () => {
+export const GoogleTranslateInit: React.FC = () => {
   useEffect(() => {
     // Expose the init callback before the script loads
-    window.googleTranslateElementInit = () => {
+    window.googleTranslateElementInit = (): void => {
       if (!window.google?.translate) return;
       new window.google.translate.TranslateElement(
         {
@@ -25,8 +27,8 @@ export const GoogleTranslateInit = () => {
     };
 
     // Programmatic language trigger used by LanguageSwitcher
-    window.__setGoogleTranslateLang = (languageCode: string) => {
-      const attemptSet = (attempts: number = 0) => {
+    window.__setGoogleTranslateLang = (languageCode: string): void => {
+      const attemptSet = (attempts: number = 0): void => {
         const select = document.querySelector('#gt-hidden-container select.goog-te-combo') as HTMLSelectElement;
         if (select) {
           select.value = languageCode;

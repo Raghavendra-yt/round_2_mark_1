@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import React, { memo } from 'react';
 import { questions } from '@/data/questions';
 import { isFirebaseConfigured } from '@/firebase';
 import { useQuiz } from './hooks/useQuiz';
@@ -11,7 +11,7 @@ import { QuizScore } from './components/QuizScore';
  * 
  * @component
  */
-export const Quiz = memo(() => {
+export const Quiz: React.FC = memo(() => {
   const {
     questionIndex,
     score,

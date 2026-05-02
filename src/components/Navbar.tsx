@@ -1,5 +1,4 @@
-import { useState, useCallback, memo } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useCallback, memo, KeyboardEvent, MouseEvent } from 'react';
 
 import { LANGUAGES, NAV_LINKS, APP_NAME, ARIA_LABELS, STORAGE_KEYS } from '@/constants';
 import { useActiveSection } from '../hooks/useActiveSection';
@@ -25,7 +24,7 @@ interface NavLinkProps {
 // ── Icon Components ───────────────────────────────────────────────────────────
 
 /** Globe SVG icon for the language switcher. */
-const GlobeIcon = memo(() => {
+const GlobeIcon: React.FC = memo(() => {
   return (
     <svg
       width="15"
@@ -48,7 +47,7 @@ const GlobeIcon = memo(() => {
 GlobeIcon.displayName = 'GlobeIcon';
 
 /** Chevron-down icon for the language dropdown toggle. */
-const ChevronDownIcon = memo(() => {
+const ChevronDownIcon: React.FC = memo(() => {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13" aria-hidden="true">
       <path
@@ -70,7 +69,7 @@ ChevronDownIcon.displayName = 'ChevronDownIcon';
  * 
  * @component
  */
-const LanguageSwitcher = memo(() => {
+const LanguageSwitcher: React.FC = memo(() => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedCode, setSelectedCode] = useLocalStorage<string>(STORAGE_KEYS.LANGUAGE, 'en');
 
@@ -89,11 +88,11 @@ const LanguageSwitcher = memo(() => {
     }
   }, [setSelectedCode]);
 
-  const handleToggle = useCallback(() => {
+  const handleToggle = useCallback((): void => {
     setIsOpen((prev) => !prev);
   }, []);
 
-  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>): void => {
     if (event.key === 'Escape') setIsOpen(false);
   }, []);
 
@@ -162,7 +161,7 @@ LanguageSwitcher.displayName = 'LanguageSwitcher';
  * 
  * @component
  */
-const NavLink = memo(({ href, label, aria, sectionId, activeSection, onClick }: NavLinkProps) => {
+const NavLink: React.FC<NavLinkProps> = memo(({ href, label, aria, sectionId, activeSection, onClick }) => {
   return (
     <li>
       <a
@@ -180,15 +179,6 @@ const NavLink = memo(({ href, label, aria, sectionId, activeSection, onClick }: 
 
 NavLink.displayName = 'NavLink';
 
-NavLink.propTypes = {
-  href: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  aria: PropTypes.string.isRequired,
-  sectionId: PropTypes.string.isRequired,
-  activeSection: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-};
-
 // ── Navbar ────────────────────────────────────────────────────────────────────
 
 /**
@@ -196,12 +186,12 @@ NavLink.propTypes = {
  * 
  * @component
  */
-export const Navbar = memo(() => {
+export const Navbar: React.FC = memo(() => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const activeSection = useActiveSection();
 
-  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
-  const toggleMenu = useCallback((e: MouseEvent<HTMLButtonElement>) => {
+  const closeMenu = useCallback((): void => setIsMenuOpen(false), []);
+  const toggleMenu = useCallback((e: MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation();
     setIsMenuOpen((prev) => !prev);
   }, []);

@@ -1,5 +1,4 @@
-import { useRef, memo } from 'react';
-import PropTypes from 'prop-types';
+import React, { useRef, memo } from 'react';
 
 /**
  * Props for the Particle component.
@@ -29,7 +28,7 @@ interface ParticleData extends ParticleProps {
  * 
  * @component
  */
-const Particle = memo(({ size, left, duration, delay }: ParticleProps) => {
+const Particle: React.FC<ParticleProps> = memo(({ size, left, duration, delay }) => {
   return (
     <div
       className="particle"
@@ -46,20 +45,13 @@ const Particle = memo(({ size, left, duration, delay }: ParticleProps) => {
 
 Particle.displayName = 'Particle';
 
-Particle.propTypes = {
-  size: PropTypes.number.isRequired,
-  left: PropTypes.number.isRequired,
-  duration: PropTypes.number.isRequired,
-  delay: PropTypes.number.isRequired,
-};
-
 /**
  * Full-bleed hero section with animated particles and CTA buttons.
  * Serves as the primary landing visual for the application.
  * 
  * @component
  */
-export const Hero = memo(() => {
+export const Hero: React.FC = memo(() => {
   // Stable particles via ref — won't re-randomize on re-renders
   const particlesRef = useRef<ParticleData[]>(
     Array.from({ length: 14 }, (_, index) => ({

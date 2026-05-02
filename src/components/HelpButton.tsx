@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef, useCallback, memo } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 /**
@@ -47,9 +46,9 @@ const HELP_OPTIONS: HelpOptionData[] = [
  * 
  * @component
  */
-const HelpOption = memo(({ option, onSelect }: HelpOptionProps) => {
+const HelpOption: React.FC<HelpOptionProps> = memo(({ option, onSelect }) => {
   /** Handles the selection of the emergency option. */
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((): void => {
     onSelect(option);
   }, [option, onSelect]);
 
@@ -70,25 +69,13 @@ const HelpOption = memo(({ option, onSelect }: HelpOptionProps) => {
 
 HelpOption.displayName = 'HelpOption';
 
-HelpOption.propTypes = {
-  option: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    className: PropTypes.string.isRequired,
-    icon: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    sub: PropTypes.string.isRequired,
-    number: PropTypes.string.isRequired,
-  }).isRequired,
-  onSelect: PropTypes.func.isRequired,
-};
-
 /** 
  * Floating emergency help button (SOS) with expandable quick-dial menu.
  * Features focus trapping and keyboard navigation for critical accessibility.
  * 
  * @component
  */
-export const HelpButton = memo(() => {
+export const HelpButton: React.FC = memo(() => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -97,12 +84,12 @@ export const HelpButton = memo(() => {
 
   // Close when clicking outside or pressing Escape
   useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
+    const handleOutsideClick = (event: MouseEvent): void => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-    const handleEscape = (event: globalThis.KeyboardEvent) => {
+    const handleEscape = (event: globalThis.KeyboardEvent): void => {
       if (event.key === 'Escape') setIsOpen(false);
     };
     document.addEventListener('mousedown', handleOutsideClick);
@@ -114,13 +101,13 @@ export const HelpButton = memo(() => {
   }, []);
 
   /** Handles the call action for a selected option. */
-  const handleCall = useCallback((option: HelpOptionData) => {
+  const handleCall = useCallback((option: HelpOptionData): void => {
     window.location.href = `tel:${option.number}`;
     setIsOpen(false);
   }, []);
 
   /** Toggles the visibility of the help menu. */
-  const handleToggle = useCallback(() => {
+  const handleToggle = useCallback((): void => {
     setIsOpen((prev) => !prev);
   }, []);
 

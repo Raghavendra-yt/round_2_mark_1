@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
 import { Loader, Library } from '@googlemaps/js-api-loader';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -21,7 +20,7 @@ import { WeatherData, Station } from './types';
  * 
  * @component
  */
-export const PollMap = memo(() => {
+export const PollMap: React.FC = memo(() => {
   const { phase, userPosition, locate } = useGeolocation();
   const { trackEvent } = useAnalytics();
 
@@ -65,7 +64,7 @@ export const PollMap = memo(() => {
     if (!userPosition) return;
 
     /** Fetches weather data. */
-    const loadWeather = async () => {
+    const loadWeather = async (): Promise<void> => {
       try {
         const data = await fetchWeather(userPosition.lat, userPosition.lng);
         setWeather(data);
@@ -75,7 +74,7 @@ export const PollMap = memo(() => {
     };
 
     /** Fetches human-readable location name. */
-    const loadLocationName = async () => {
+    const loadLocationName = async (): Promise<void> => {
       try {
         const name = await reverseGeocode(userPosition.lat, userPosition.lng);
         setLocationName(name);
@@ -105,7 +104,7 @@ export const PollMap = memo(() => {
     });
 
     /** Loads Google Maps API and initializes map instance. */
-    const initMap = async () => {
+    const initMap = async (): Promise<void> => {
       try {
         const google = await loader.load();
         if (!googleMapRef.current && mapRef.current) {
@@ -143,7 +142,7 @@ export const PollMap = memo(() => {
     markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current = [];
 
-    const google = (window as any).google;
+    const google = window.google;
     if (!google) return;
 
     const userMarker = new google.maps.Marker({
@@ -207,7 +206,7 @@ export const PollMap = memo(() => {
   useEffect(() => {
     if (!selectedStation || !googleMapRef.current || !MAPS_CONFIGURED || !userPosition) return;
 
-    const google = (window as any).google;
+    const google = window.google;
     if (!google) return;
 
     const directionsService = new google.maps.DirectionsService();
@@ -217,9 +216,9 @@ export const PollMap = memo(() => {
         destination: { lat: selectedStation.lat, lng: selectedStation.lng },
         travelMode: google.maps.TravelMode.DRIVING,
       },
-      (result: google.maps.DirectionsResult | null, status: any) => {
-        if (status === 'OK' && result) {
-          directionsRendererRef.current?.setDirections(result);
+      (result: google.maps.DirectionsResult | null, status: google.maps.DirectionsStatus) => {
+        if (status === google.maps.DirectionsStatus.OK && result && directionsRendererRef.current) {
+          directionsRendererRef.current.setDirections(result);
         }
       }
     );
@@ -227,9 +226,8 @@ export const PollMap = memo(() => {
 
   /**
    * Handles selection of a polling station from the list.
-   * @param {Station} station - The selected station.
    */
-  const handleSelectStation = useCallback((station: Station) => {
+  const handleSelectStation = useCallback((station: Station): void => {
     setSelectedStation(station);
     if (googleMapRef.current) {
       googleMapRef.current.panTo({ lat: station.lat, lng: station.lng });
@@ -238,7 +236,7 @@ export const PollMap = memo(() => {
   }, []);
 
   /** Handles the "Locate" button click. */
-  const handleLocateClick = useCallback(() => {
+  const handleLocateClick = useCallback((): void => {
     locate();
     trackEvent('map_locate_start');
   }, [locate, trackEvent]);

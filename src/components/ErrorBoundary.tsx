@@ -1,5 +1,4 @@
 import React, { ErrorInfo } from 'react';
-import PropTypes from 'prop-types';
 
 /**
  * Props for the ErrorBoundary component.
@@ -82,11 +81,5 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     return this.props.children;
   }
 }
-
-ErrorBoundary.propTypes = {
-  children: PropTypes.node.isRequired,
-  fallback: PropTypes.node,
-  componentName: PropTypes.string,
-};
 
 export default ErrorBoundary;

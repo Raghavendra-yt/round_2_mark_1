@@ -1,5 +1,4 @@
-import { useState, useCallback, useMemo, ChangeEvent, memo } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useCallback, useMemo, ChangeEvent, memo } from 'react';
 
 import { glossaryTerms } from '@/data/content';
 import { SEARCH_DEBOUNCE_MS } from '@/constants';
@@ -21,7 +20,7 @@ interface GlossaryItemData {
  * 
  * @component
  */
-const GlossaryCard = memo(({ item }: { item: GlossaryItemData }) => (
+const GlossaryCard: React.FC<{ item: GlossaryItemData }> = memo(({ item }) => (
   <article className="glossary-card reveal" role="listitem">
     <div className="glossary-term">{item.term}</div>
     <div className="glossary-def">{item.def}</div>
@@ -30,25 +29,18 @@ const GlossaryCard = memo(({ item }: { item: GlossaryItemData }) => (
 
 GlossaryCard.displayName = 'GlossaryCard';
 
-GlossaryCard.propTypes = {
-  item: PropTypes.shape({
-    term: PropTypes.string.isRequired,
-    def: PropTypes.string.isRequired,
-  }).isRequired,
-};
-
 /**
  * Searchable election glossary section.
  * Uses a debounced search input to filter terms without excessive re-renders.
  * 
  * @component
  */
-export const Glossary = memo(() => {
+export const Glossary: React.FC = memo(() => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const debouncedQuery = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
 
   /** Handles changes to the search input, including sanitization. */
-  const handleSearchChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = useCallback((event: ChangeEvent<HTMLInputElement>): void => {
     setSearchQuery(sanitizeText(event.target.value));
   }, []);
 

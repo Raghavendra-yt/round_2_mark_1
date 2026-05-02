@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import React, { memo } from 'react';
 
 /**
  * Call-to-action section encouraging civic participation.
@@ -6,7 +6,7 @@ import { memo } from 'react';
  * 
  * @component
  */
-export const CTA = memo(() => {
+export const CTA: React.FC = memo(() => {
   return (
     <section className="cta-section" aria-labelledby="cta-heading">
       <div className="cta-inner">

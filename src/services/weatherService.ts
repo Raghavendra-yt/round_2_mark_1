@@ -1,6 +1,9 @@
 import { WEATHER_API_BASE } from '@/constants';
 import { apiClient } from './apiClient';
 
+/**
+ * Interface representing the current weather structure returned by the API.
+ */
 export interface CurrentWeather {
   temperature: number;
   weathercode: number;
@@ -10,24 +13,39 @@ export interface CurrentWeather {
   time: string;
 }
 
-const CACHE_KEY = 'elected_weather_cache';
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const CACHE_KEY: string = 'elected_weather_cache';
+const CACHE_TTL: number = 10 * 60 * 1000; // 10 minutes
 
 interface CachedWeather {
   timestamp: number;
   data: CurrentWeather;
 }
 
+interface OpenMeteoResponse {
+  current_weather: CurrentWeather;
+  latitude: number;
+  longitude: number;
+  generationtime_ms: number;
+  utc_offset_seconds: number;
+  timezone: string;
+  timezone_abbreviation: string;
+  elevation: number;
+}
+
 /**
  * Fetches current weather data from the Open-Meteo free API.
  * Implements client-side caching to reduce redundant API calls.
+ * 
+ * @param {number} latitude - User's latitude.
+ * @param {number} longitude - User's longitude.
+ * @returns {Promise<CurrentWeather>} - Current weather data.
  */
 export async function fetchWeather(latitude: number, longitude: number): Promise<CurrentWeather> {
-  const cacheKey = `${CACHE_KEY}_${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
+  const cacheKey: string = `${CACHE_KEY}_${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
   
   // Check cache
   try {
-    const cached = sessionStorage.getItem(cacheKey);
+    const cached: string | null = sessionStorage.getItem(cacheKey);
     if (cached) {
       const { timestamp, data }: CachedWeather = JSON.parse(cached);
       if (Date.now() - timestamp < CACHE_TTL) {
@@ -38,16 +56,16 @@ export async function fetchWeather(latitude: number, longitude: number): Promise
     // Silently continue if cache fails
   }
 
-  const url = apiClient.buildUrl(WEATHER_API_BASE, {
-    latitude,
-    longitude,
+  const url: string = apiClient.buildUrl(WEATHER_API_BASE, {
+    latitude: String(latitude),
+    longitude: String(longitude),
     current_weather: 'true',
     timezone: 'auto'
   });
 
   try {
-    const json = await apiClient.get<any>(url);
-    const weatherData = json.current_weather as CurrentWeather;
+    const json: OpenMeteoResponse = await apiClient.get<OpenMeteoResponse>(url);
+    const weatherData: CurrentWeather = json.current_weather;
 
     // Update cache
     try {

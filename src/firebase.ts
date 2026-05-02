@@ -7,7 +7,17 @@ import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
  * Firebase configuration object.
  * Values are populated from environment variables.
  */
-const firebaseConfig = {
+interface FirebaseConfig {
+  apiKey: string | undefined;
+  authDomain: string | undefined;
+  projectId: string | undefined;
+  storageBucket: string | undefined;
+  messagingSenderId: string | undefined;
+  appId: string | undefined;
+  measurementId: string | undefined;
+}
+
+const firebaseConfig: FirebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
@@ -31,19 +41,23 @@ let auth: Auth | null = null;
 let analytics: Analytics | null = null;
 
 if (isFirebaseConfigured) {
-  // Avoid initializing multiple times (HMR)
-  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-  db = getFirestore(app);
-  auth = getAuth(app);
+  try {
+    // Avoid initializing multiple times (HMR)
+    app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+    db = getFirestore(app);
+    auth = getAuth(app);
 
-  // Analytics is optional and only works in browser with valid config
-  isSupported()
-    .then((yes) => {
-      if (yes && app) analytics = getAnalytics(app);
-    })
-    .catch(() => {
-      // Silent fail for analytics in development or blocked environments
-    });
+    // Analytics is optional and only works in browser with valid config
+    isSupported()
+      .then((yes: boolean) => {
+        if (yes && app) analytics = getAnalytics(app);
+      })
+      .catch(() => {
+        // Silent fail for analytics in development or blocked environments
+      });
+  } catch (error) {
+    console.error('Firebase initialization failed:', error);
+  }
 }
 
 export { app, db, auth, analytics };

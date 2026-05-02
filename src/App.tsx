@@ -1,5 +1,4 @@
-import { Suspense, lazy, memo } from 'react';
-import PropTypes from 'prop-types';
+import React, { Suspense, lazy, memo } from 'react';
 
 import { ARIA_LABELS, APP_NAME, SKIP_LINK_TARGET } from '@/constants';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -28,7 +27,7 @@ const CTA       = lazy(() => import('./features/core/CTA').then((m) => ({ defaul
  * 
  * @component
  */
-const App = memo(() => {
+const App: React.FC = memo(() => {
   useScrollReveal();
   const activeSection = useActiveSection();
   useAnalytics(activeSection);

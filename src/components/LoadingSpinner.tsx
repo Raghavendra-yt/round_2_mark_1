@@ -1,5 +1,4 @@
-import { memo } from 'react';
-import PropTypes from 'prop-types';
+import React, { memo } from 'react';
 
 /**
  * Props for the LoadingSpinner component.
@@ -15,7 +14,7 @@ interface LoadingSpinnerProps {
  * 
  * @component
  */
-export const LoadingSpinner = memo(({ label = 'Loading…' }: LoadingSpinnerProps) => {
+export const LoadingSpinner: React.FC<LoadingSpinnerProps> = memo(({ label = 'Loading…' }) => {
   return (
     <div
       className="loading-spinner-container"
@@ -30,7 +29,3 @@ export const LoadingSpinner = memo(({ label = 'Loading…' }: LoadingSpinnerProp
 });
 
 LoadingSpinner.displayName = 'LoadingSpinner';
-
-LoadingSpinner.propTypes = {
-  label: PropTypes.string,
-};

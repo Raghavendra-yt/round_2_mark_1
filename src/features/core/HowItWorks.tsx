@@ -1,5 +1,4 @@
-import { memo } from 'react';
-import PropTypes from 'prop-types';
+import React, { memo } from 'react';
 import { steps } from '@/data/content';
 
 /**
@@ -21,7 +20,7 @@ interface StepCardProps {
  * 
  * @component
  */
-const StepCard = memo(({ num, icon, title, desc }: StepCardProps) => {
+const StepCard: React.FC<StepCardProps> = memo(({ num, icon, title, desc }) => {
   return (
     <article className="step-card reveal" role="listitem">
       <div className="step-num" aria-hidden="true">{num}</div>
@@ -34,19 +33,12 @@ const StepCard = memo(({ num, icon, title, desc }: StepCardProps) => {
 
 StepCard.displayName = 'StepCard';
 
-StepCard.propTypes = {
-  num: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  desc: PropTypes.string.isRequired,
-};
-
 /** 
  * Section detailing the steps every voter should know.
  * 
  * @component
  */
-export const HowItWorks = memo(() => {
+export const HowItWorks: React.FC = memo(() => {
   return (
     <section id="how" aria-labelledby="how-heading">
       <div className="section-inner">

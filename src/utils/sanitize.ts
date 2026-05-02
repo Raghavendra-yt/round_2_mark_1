@@ -8,7 +8,9 @@ import DOMPurify from 'dompurify';
  */
 export const sanitizeHtml = (dirty: unknown): string => {
   if (typeof dirty !== 'string') return '';
-  return DOMPurify.sanitize(dirty, { ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'br', 'p', 'ul', 'li', 'ol'] });
+  return DOMPurify.sanitize(dirty, { 
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'br', 'p', 'ul', 'li', 'ol'] 
+  }) as string;
 };
 
 /**
@@ -18,7 +20,7 @@ export const sanitizeHtml = (dirty: unknown): string => {
  */
 export const sanitizeText = (dirty: unknown): string => {
   if (typeof dirty !== 'string') return '';
-  return DOMPurify.sanitize(dirty, { ALLOWED_TAGS: [] });
+  return DOMPurify.sanitize(dirty, { ALLOWED_TAGS: [] }) as string;
 };
 
 /**
@@ -45,6 +47,5 @@ export const sanitizeUrl = (url: unknown): string | null => {
  */
 export const sanitizeName = (name: unknown): string => {
   if (typeof name !== 'string') return '';
-  // Removed unnecessary escape character to fix no-useless-escape
   return name.replace(/[^a-zA-Z\u00C0-\u024F\s'-]/g, '').trim().slice(0, 64);
 };
