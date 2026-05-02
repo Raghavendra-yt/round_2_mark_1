@@ -10,8 +10,7 @@ import { INTERSECTION_THRESHOLD } from '../constants';
 export const useScrollReveal = (threshold: number = INTERSECTION_THRESHOLD): void => {
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const observe = useCallback((): void => {
-    const items = document.querySelectorAll('.reveal');
+  const setupObserver = useCallback((): IntersectionObserver => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -24,13 +23,33 @@ export const useScrollReveal = (threshold: number = INTERSECTION_THRESHOLD): voi
       { threshold }
     );
     observerRef.current = observer;
-    items.forEach((element) => observer.observe(element));
+    return observer;
   }, [threshold]);
 
   useEffect(() => {
-    observe();
-    return () => {
-      observerRef.current?.disconnect();
+    const observer = setupObserver();
+    
+    // 1. Observe existing items
+    const observeExisting = () => {
+      const items = document.querySelectorAll('.reveal:not(.visible)');
+      items.forEach((el) => observer.observe(el));
     };
-  }, [observe]);
+
+    observeExisting();
+
+    // 2. Use MutationObserver to detect lazily loaded components adding .reveal elements
+    const mutationObserver = new MutationObserver(() => {
+      observeExisting();
+    });
+
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
+    };
+  }, [setupObserver]);
 };
