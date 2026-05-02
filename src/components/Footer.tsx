@@ -1,7 +1,13 @@
-import { APP_NAME } from '../constants';
+import { memo } from 'react';
+import { APP_NAME } from '@/constants';
 
-/** Page footer with branding and non-partisan disclaimer. */
-function Footer() {
+/**
+ * Page footer with branding and non-partisan disclaimer.
+ * Provides context on the application's purpose and privacy stance.
+ * 
+ * @component
+ */
+const Footer = memo(() => {
   return (
     <footer>
       <div className="footer-logo">{APP_NAME}</div>
@@ -13,6 +19,8 @@ function Footer() {
       </div>
     </footer>
   );
-}
+});
+
+Footer.displayName = 'Footer';
 
 export { Footer };

@@ -1,5 +1,12 @@
-/** Call-to-action section encouraging civic participation. */
-export const CTA = () => {
+import { memo } from 'react';
+
+/**
+ * Call-to-action section encouraging civic participation.
+ * Final section of the page to reinforce learning and encourage sharing.
+ * 
+ * @component
+ */
+export const CTA = memo(() => {
   return (
     <section className="cta-section" aria-labelledby="cta-heading">
       <div className="cta-inner">
@@ -31,4 +38,6 @@ export const CTA = () => {
       </div>
     </section>
   );
-};
+});
+
+CTA.displayName = 'CTA';

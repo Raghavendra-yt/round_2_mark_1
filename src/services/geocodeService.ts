@@ -1,4 +1,4 @@
-import { GEOCODE_API_BASE } from '../constants';
+import { GEOCODE_API_BASE } from '@/constants';
 import { apiClient } from './apiClient';
 
 const CACHE_KEY = 'elected_geocode_cache';

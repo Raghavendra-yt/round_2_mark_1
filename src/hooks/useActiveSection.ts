@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { SECTION_IDS } from '../constants';
+import { SECTION_IDS } from '@/constants';
 
 /**
  * Tracks which section is currently visible in the viewport.

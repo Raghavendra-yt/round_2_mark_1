@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { INTERSECTION_THRESHOLD } from '../constants';
+import { INTERSECTION_THRESHOLD } from '@/constants';
 
 /**
  * Observes all elements with class `.reveal` and adds `.visible`

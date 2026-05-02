@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { Footer } from './Footer';
-import { APP_NAME } from '../constants';
+import { APP_NAME } from '@/constants';
 
 describe('Footer Component', () => {
   it('renders application name', () => {

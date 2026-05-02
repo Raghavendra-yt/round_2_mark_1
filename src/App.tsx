@@ -1,14 +1,16 @@
-import { Suspense, lazy } from 'react';
-import { useScrollReveal } from './hooks/useScrollReveal';
-import { useActiveSection } from './hooks/useActiveSection';
-import { useAnalytics } from './hooks/useAnalytics';
-import { GoogleTranslateInit } from './components/GoogleTranslate';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
-import { HelpButton } from './components/HelpButton';
-import { ARIA_LABELS, APP_NAME, SKIP_LINK_TARGET } from './constants';
+import { Suspense, lazy, memo } from 'react';
+import PropTypes from 'prop-types';
+
+import { ARIA_LABELS, APP_NAME, SKIP_LINK_TARGET } from '@/constants';
 import ErrorBoundary from './components/ErrorBoundary';
 import { LoadingSpinner } from './components/LoadingSpinner';
+import { Footer } from './components/Footer';
+import { GoogleTranslateInit } from './components/GoogleTranslate';
+import { HelpButton } from './components/HelpButton';
+import { Navbar } from './components/Navbar';
+import { useActiveSection } from './hooks/useActiveSection';
+import { useAnalytics } from './hooks/useAnalytics';
+import { useScrollReveal } from './hooks/useScrollReveal';
 
 // Route-level code splitting with React.lazy
 const Hero      = lazy(() => import('./features/hero/Hero').then((m) => ({ default: m.Hero })));
@@ -20,8 +22,13 @@ const Quiz      = lazy(() => import('./features/quiz/Quiz').then((m) => ({ defau
 const Glossary  = lazy(() => import('./features/core/Glossary').then((m) => ({ default: m.Glossary })));
 const CTA       = lazy(() => import('./features/core/CTA').then((m) => ({ default: m.CTA })));
 
-/** Root application component. Assembles all page sections with lazy loading. */
-function App() {
+/**
+ * Root application component.
+ * Assembles all page sections with lazy loading and global state orchestration.
+ * 
+ * @component
+ */
+const App = memo(() => {
   useScrollReveal();
   const activeSection = useActiveSection();
   useAnalytics(activeSection);
@@ -100,6 +107,8 @@ function App() {
       <HelpButton />
     </>
   );
-}
+});
+
+App.displayName = 'App';
 
 export { App };

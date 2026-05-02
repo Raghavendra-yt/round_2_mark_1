@@ -3,6 +3,10 @@ import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 
+/**
+ * Firebase configuration object.
+ * Values are populated from environment variables.
+ */
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -13,7 +17,10 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Check if Firebase is configured (not just placeholder values)
+/**
+ * Indicates if Firebase has been correctly configured with valid API keys.
+ * Used to conditionally enable/disable Firebase-dependent features.
+ */
 export const isFirebaseConfigured: boolean =
   !!firebaseConfig.apiKey &&
   !firebaseConfig.apiKey.includes('YOUR_');
@@ -34,7 +41,9 @@ if (isFirebaseConfigured) {
     .then((yes) => {
       if (yes && app) analytics = getAnalytics(app);
     })
-    .catch(() => {});
+    .catch(() => {
+      // Silent fail for analytics in development or blocked environments
+    });
 }
 
 export { app, db, auth, analytics };

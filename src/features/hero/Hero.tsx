@@ -1,18 +1,35 @@
-import { useRef, memo, JSX } from 'react';
+import { useRef, memo } from 'react';
+import PropTypes from 'prop-types';
 
+/**
+ * Props for the Particle component.
+ */
 interface ParticleProps {
+  /** Size of the particle in pixels. */
   size: number;
+  /** Horizontal position as a percentage (0-100). */
   left: number;
+  /** Animation duration in seconds. */
   duration: number;
+  /** Animation delay in seconds. */
   delay: number;
 }
 
+/**
+ * Data structure for particle initialization.
+ */
 interface ParticleData extends ParticleProps {
+  /** Unique identifier for the particle. */
   id: number;
 }
 
-/** Single animated particle in the hero background. */
-const Particle = memo<ParticleProps>(function Particle({ size, left, duration, delay }): JSX.Element {
+/**
+ * Single animated particle in the hero background.
+ * Uses CSS animations for performance.
+ * 
+ * @component
+ */
+const Particle = memo(({ size, left, duration, delay }: ParticleProps) => {
   return (
     <div
       className="particle"
@@ -27,8 +44,22 @@ const Particle = memo<ParticleProps>(function Particle({ size, left, duration, d
   );
 });
 
-/** Full-bleed hero section with animated particles and CTA buttons. */
-export const Hero = () => {
+Particle.displayName = 'Particle';
+
+Particle.propTypes = {
+  size: PropTypes.number.isRequired,
+  left: PropTypes.number.isRequired,
+  duration: PropTypes.number.isRequired,
+  delay: PropTypes.number.isRequired,
+};
+
+/**
+ * Full-bleed hero section with animated particles and CTA buttons.
+ * Serves as the primary landing visual for the application.
+ * 
+ * @component
+ */
+export const Hero = memo(() => {
   // Stable particles via ref — won't re-randomize on re-renders
   const particlesRef = useRef<ParticleData[]>(
     Array.from({ length: 14 }, (_, index) => ({
@@ -84,4 +115,6 @@ export const Hero = () => {
       </div>
     </section>
   );
-};
+});
+
+Hero.displayName = 'Hero';

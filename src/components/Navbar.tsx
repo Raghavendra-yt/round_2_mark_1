@@ -1,8 +1,10 @@
-import { useState, useCallback, memo, KeyboardEvent, MouseEvent } from 'react';
+import { useState, useCallback, memo } from 'react';
+import PropTypes from 'prop-types';
+
+import { LANGUAGES, NAV_LINKS, APP_NAME, ARIA_LABELS, STORAGE_KEYS } from '@/constants';
 import { useActiveSection } from '../hooks/useActiveSection';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { GoogleTranslateInit } from './GoogleTranslate';
-import { LANGUAGES, NAV_LINKS, APP_NAME, ARIA_LABELS, STORAGE_KEYS } from '../constants';
 
 interface Language {
   code: string;
@@ -65,8 +67,10 @@ ChevronDownIcon.displayName = 'ChevronDownIcon';
 /**
  * Dropdown that lets users choose a display language via Google Translate.
  * Selected language is persisted to localStorage.
+ * 
+ * @component
  */
-const LanguageSwitcher = () => {
+const LanguageSwitcher = memo(() => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedCode, setSelectedCode] = useLocalStorage<string>(STORAGE_KEYS.LANGUAGE, 'en');
 
@@ -78,7 +82,6 @@ const LanguageSwitcher = () => {
     document.documentElement.lang = language.code;
 
     if (language.gtCode === 'en') {
-      // Attempt to restore original — Google Translate uses a cookie
       const restoreBtn = document.querySelector('.goog-te-restore, a.goog-logo-link') as HTMLElement;
       if (restoreBtn) restoreBtn.click();
     } else {
@@ -123,33 +126,42 @@ const LanguageSwitcher = () => {
           <div className="lang-powered">
             Powered by Google Translate
           </div>
-          {LANGUAGES.map((language) => (
-            <button
-              key={language.code}
-              id={`lang-option-${language.code}`}
-              className={`lang-option${language.code === selectedLanguage.code ? ' active' : ''}`}
-              role="option"
-              aria-selected={language.code === selectedLanguage.code}
-              onClick={() => handleSelectLanguage(language as Language)}
-            >
-              <span className="lang-flag">{language.flag}</span>
-              {language.label}
-              {language.code === selectedLanguage.code && (
-                <span style={{ marginLeft: 'auto', color: 'var(--accent)', fontSize: '0.8rem' }}>
-                  ✓
-                </span>
-              )}
-            </button>
-          ))}
+          {LANGUAGES.map((language) => {
+            const handleLanguageClick = () => handleSelectLanguage(language as Language);
+            return (
+              <button
+                key={language.code}
+                id={`lang-option-${language.code}`}
+                className={`lang-option${language.code === selectedLanguage.code ? ' active' : ''}`}
+                role="option"
+                aria-selected={language.code === selectedLanguage.code}
+                onClick={handleLanguageClick}
+              >
+                <span className="lang-flag">{language.flag}</span>
+                {language.label}
+                {language.code === selectedLanguage.code && (
+                  <span style={{ marginLeft: 'auto', color: 'var(--accent)', fontSize: '0.8rem' }}>
+                    ✓
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
   );
-};
+});
+
+LanguageSwitcher.displayName = 'LanguageSwitcher';
 
 // ── Navigation Link ───────────────────────────────────────────────────────────
 
-/** A single navigation anchor that highlights when its section is active. */
+/**
+ * A single navigation anchor that highlights when its section is active.
+ * 
+ * @component
+ */
 const NavLink = memo(({ href, label, aria, sectionId, activeSection, onClick }: NavLinkProps) => {
   return (
     <li>
@@ -168,10 +180,23 @@ const NavLink = memo(({ href, label, aria, sectionId, activeSection, onClick }: 
 
 NavLink.displayName = 'NavLink';
 
+NavLink.propTypes = {
+  href: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  aria: PropTypes.string.isRequired,
+  sectionId: PropTypes.string.isRequired,
+  activeSection: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
+
 // ── Navbar ────────────────────────────────────────────────────────────────────
 
-/** Primary navigation bar with language switcher, mobile menu, and active-section highlighting. */
-export const Navbar = () => {
+/**
+ * Primary navigation bar with language switcher, mobile menu, and active-section highlighting.
+ * 
+ * @component
+ */
+export const Navbar = memo(() => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const activeSection = useActiveSection();
 
@@ -183,7 +208,6 @@ export const Navbar = () => {
 
   return (
     <nav role="navigation" aria-label={ARIA_LABELS.MAIN_NAV}>
-      {/* Hidden Google Translate initialiser */}
       <GoogleTranslateInit />
 
       <a href="#hero" className="nav-logo" aria-label={`${APP_NAME} — Home`}>
@@ -223,4 +247,6 @@ export const Navbar = () => {
       </div>
     </nav>
   );
-};
+});
+
+Navbar.displayName = 'Navbar';

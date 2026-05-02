@@ -1,20 +1,38 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import PropTypes from 'prop-types';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 
+/**
+ * Data structure for an emergency help option.
+ */
 interface HelpOptionData {
+  /** Unique identifier for the option. */
   id: string;
+  /** CSS class for styling. */
   className: string;
+  /** Emoji or icon. */
   icon: string;
+  /** Primary label. */
   label: string;
+  /** Sub-label or description. */
   sub: string;
+  /** Phone number to dial. */
   number: string;
 }
 
+/**
+ * Props for the HelpOption component.
+ */
 interface HelpOptionProps {
+  /** The option data to display. */
   option: HelpOptionData;
+  /** Callback when the option is selected. */
   onSelect: (option: HelpOptionData) => void;
 }
 
+/**
+ * Static list of emergency help options.
+ */
 const HELP_OPTIONS: HelpOptionData[] = [
   { id: 'police', className: 'hi-police', icon: '🚔', label: 'Call Police', sub: 'Emergency: 911', number: '911' },
   { id: 'emergency', className: 'hi-emergency', icon: '🚨', label: 'Emergency', sub: 'General emergency line', number: '911' },
@@ -24,13 +42,22 @@ const HELP_OPTIONS: HelpOptionData[] = [
   { id: 'sos', className: 'hi-sos', icon: '🆘', label: 'SOS', sub: 'International distress', number: '112' },
 ];
 
-/** Single emergency option in the help menu. */
+/** 
+ * Single emergency option in the help menu.
+ * 
+ * @component
+ */
 const HelpOption = memo(({ option, onSelect }: HelpOptionProps) => {
+  /** Handles the selection of the emergency option. */
+  const handleClick = useCallback(() => {
+    onSelect(option);
+  }, [option, onSelect]);
+
   return (
     <button
       className={`help-item ${option.className}`}
       aria-label={`${option.label} — ${option.sub}`}
-      onClick={() => onSelect(option)}
+      onClick={handleClick}
     >
       <div className="help-item-icon" aria-hidden="true">{option.icon}</div>
       <div className="help-item-text">
@@ -43,8 +70,25 @@ const HelpOption = memo(({ option, onSelect }: HelpOptionProps) => {
 
 HelpOption.displayName = 'HelpOption';
 
-/** Floating emergency help button (SOS) with expandable quick-dial menu. */
-export const HelpButton = () => {
+HelpOption.propTypes = {
+  option: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    className: PropTypes.string.isRequired,
+    icon: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    sub: PropTypes.string.isRequired,
+    number: PropTypes.string.isRequired,
+  }).isRequired,
+  onSelect: PropTypes.func.isRequired,
+};
+
+/** 
+ * Floating emergency help button (SOS) with expandable quick-dial menu.
+ * Features focus trapping and keyboard navigation for critical accessibility.
+ * 
+ * @component
+ */
+export const HelpButton = memo(() => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -69,11 +113,13 @@ export const HelpButton = () => {
     };
   }, []);
 
+  /** Handles the call action for a selected option. */
   const handleCall = useCallback((option: HelpOptionData) => {
     window.location.href = `tel:${option.number}`;
     setIsOpen(false);
   }, []);
 
+  /** Toggles the visibility of the help menu. */
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
@@ -113,4 +159,6 @@ export const HelpButton = () => {
       </button>
     </div>
   );
-};
+});
+
+HelpButton.displayName = 'HelpButton';

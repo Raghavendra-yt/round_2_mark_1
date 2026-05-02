@@ -1,14 +1,26 @@
 import { memo } from 'react';
+import PropTypes from 'prop-types';
 import { steps } from '@/data/content';
 
+/**
+ * Props for the StepCard component.
+ */
 interface StepCardProps {
+  /** The step number (e.g., "01"). */
   num: string;
+  /** Emoji or icon. */
   icon: string;
+  /** Title of the step. */
   title: string;
+  /** Description of the step. */
   desc: string;
 }
 
-/** Single voter step card. */
+/** 
+ * Single voter step card.
+ * 
+ * @component
+ */
 const StepCard = memo(({ num, icon, title, desc }: StepCardProps) => {
   return (
     <article className="step-card reveal" role="listitem">
@@ -22,8 +34,19 @@ const StepCard = memo(({ num, icon, title, desc }: StepCardProps) => {
 
 StepCard.displayName = 'StepCard';
 
-/** Section detailing the steps every voter should know. */
-export const HowItWorks = () => {
+StepCard.propTypes = {
+  num: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  desc: PropTypes.string.isRequired,
+};
+
+/** 
+ * Section detailing the steps every voter should know.
+ * 
+ * @component
+ */
+export const HowItWorks = memo(() => {
   return (
     <section id="how" aria-labelledby="how-heading">
       <div className="section-inner">
@@ -44,4 +67,6 @@ export const HowItWorks = () => {
       </div>
     </section>
   );
-};
+});
+
+HowItWorks.displayName = 'HowItWorks';

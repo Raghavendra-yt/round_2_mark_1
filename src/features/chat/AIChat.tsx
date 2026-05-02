@@ -1,30 +1,77 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
+import DOMPurify from 'dompurify';
+
+/**
+ * Message data structure for the AI Chat.
+ */
+interface ChatMessage {
+  /** The sender's role: 'user' or 'ai'. */
+  role: 'user' | 'ai';
+  /** The text content of the message. */
+  text: string;
+}
 
 /**
  * Accessible AI Chat Interface.
  * Implements ARIA live regions, proper roles, and keyboard navigation.
+ * Uses DOMPurify to sanitize all user inputs before processing.
+ * 
+ * @component
  */
-export const AIChat = () => {
-  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([]);
+export const AIChat = memo(() => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom and notify screen readers of new messages
+  /**
+   * Auto-scrolls the chat window to the latest message.
+   */
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-    setMessages(prev => [...prev, { role: 'user', text: input }]);
+  /**
+   * Processes and sends the user message.
+   * Sanitizes input using DOMPurify before adding to state.
+   */
+  const handleSend = useCallback(() => {
+    const trimmedInput = input.trim();
+    if (!trimmedInput) return;
+
+    // Sanitize input
+    const sanitizedInput = DOMPurify.sanitize(trimmedInput);
+    
+    setMessages(prev => [...prev, { role: 'user', text: sanitizedInput }]);
     setInput('');
+
     // Simulate AI response
     setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'ai', text: 'Thank you for your question. How can I assist you with the election process?' }]);
+      setMessages(prev => [...prev, { 
+        role: 'ai', 
+        text: 'Thank you for your question. How can I assist you with the election process?' 
+      }]);
     }, 1000);
-  };
+  }, [input]);
+
+  /**
+   * Handles keyboard events for the input field.
+   * @param {React.KeyboardEvent} e - The keyboard event.
+   */
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSend();
+    }
+  }, [handleSend]);
+
+  /**
+   * Handles input change events.
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event.
+   */
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  }, []);
 
   return (
     <section 
@@ -57,8 +104,8 @@ export const AIChat = () => {
         <input 
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           placeholder="Ask a question about voting..."
           aria-label="Type your message"
           className="chat-input"
@@ -73,4 +120,6 @@ export const AIChat = () => {
       </div>
     </section>
   );
-};
+});
+
+AIChat.displayName = 'AIChat';

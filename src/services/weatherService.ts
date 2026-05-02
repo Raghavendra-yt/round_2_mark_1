@@ -1,4 +1,4 @@
-import { WEATHER_API_BASE } from '../constants';
+import { WEATHER_API_BASE } from '@/constants';
 import { apiClient } from './apiClient';
 
 export interface CurrentWeather {

@@ -1,11 +1,17 @@
+import { memo } from 'react';
 import { questions } from '@/data/questions';
 import { isFirebaseConfigured } from '@/firebase';
 import { useQuiz } from './hooks/useQuiz';
 import { QuizQuestion } from './components/QuizQuestion';
 import { QuizScore } from './components/QuizScore';
 
-/** Interactive election knowledge quiz with progress indicators. */
-export const Quiz = () => {
+/** 
+ * Interactive election knowledge quiz with progress indicators.
+ * Manages the transition between questions and the final score screen.
+ * 
+ * @component
+ */
+export const Quiz = memo(() => {
   const {
     questionIndex,
     score,
@@ -69,4 +75,6 @@ export const Quiz = () => {
       </div>
     </section>
   );
-};
+});
+
+Quiz.displayName = 'Quiz';

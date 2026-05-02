@@ -1,28 +1,58 @@
 import { useState, useRef, memo, useCallback, KeyboardEvent, RefObject } from 'react';
+import PropTypes from 'prop-types';
 import { phases } from '@/data/phases';
 
+/**
+ * Election Phase data structure.
+ */
 interface Phase {
+  /** Emoji or icon representation. */
   icon: string;
+  /** Primary title of the phase. */
   title: string;
+  /** Short summary of the phase. */
   short: string;
+  /** Detailed explanation of the phase. */
   detail: string;
+  /** Array of related keywords or tags. */
   tags: string[];
 }
 
+/**
+ * Props for the TimelineItem component.
+ */
 interface TimelineItemProps {
+  /** The phase data to display. */
   phase: Phase;
+  /** The index of this item in the timeline. */
   index: number;
+  /** Whether this item is currently selected. */
   isActive: boolean;
+  /** Callback triggered when the item is selected. */
   onSelect: (index: number) => void;
 }
 
+/**
+ * Props for the PhasePanel component.
+ */
 interface PhasePanelProps {
+  /** The currently active phase data. */
   phase: Phase;
+  /** Ref to the panel element for focus management. */
   panelRef: RefObject<HTMLDivElement>;
 }
 
-/** A single election phase row in the timeline list. */
+/** 
+ * A single election phase row in the timeline list.
+ * Supports keyboard navigation (Enter, Space, Arrows).
+ * 
+ * @component
+ */
 const TimelineItem = memo(({ phase, index, isActive, onSelect }: TimelineItemProps) => {
+  /**
+   * Handles keyboard interaction for accessibility.
+   * @param {KeyboardEvent<HTMLDivElement>} event - The keyboard event.
+   */
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -38,6 +68,11 @@ const TimelineItem = memo(({ phase, index, isActive, onSelect }: TimelineItemPro
     }
   }, [index, onSelect]);
 
+  /** Handles click events. */
+  const handleClick = useCallback(() => {
+    onSelect(index);
+  }, [index, onSelect]);
+
   return (
     <div
       className={`tl-item${isActive ? ' active' : ''}`}
@@ -45,7 +80,7 @@ const TimelineItem = memo(({ phase, index, isActive, onSelect }: TimelineItemPro
       tabIndex={0}
       aria-pressed={isActive}
       aria-label={`Phase ${index + 1}: ${phase.title}`}
-      onClick={() => onSelect(index)}
+      onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
       <div className="tl-num" aria-hidden="true">
@@ -61,7 +96,25 @@ const TimelineItem = memo(({ phase, index, isActive, onSelect }: TimelineItemPro
 
 TimelineItem.displayName = 'TimelineItem';
 
-/** Detail panel for the currently selected election phase. */
+TimelineItem.propTypes = {
+  phase: PropTypes.shape({
+    icon: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    short: PropTypes.string.isRequired,
+    detail: PropTypes.string.isRequired,
+    tags: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
+  index: PropTypes.number.isRequired,
+  isActive: PropTypes.bool.isRequired,
+  onSelect: PropTypes.func.isRequired,
+};
+
+/** 
+ * Detail panel for the currently selected election phase.
+ * Announces changes to screen readers via aria-live.
+ * 
+ * @component
+ */
 const PhasePanel = memo(({ phase, panelRef }: PhasePanelProps) => {
   return (
     <div
@@ -87,11 +140,34 @@ const PhasePanel = memo(({ phase, panelRef }: PhasePanelProps) => {
 
 PhasePanel.displayName = 'PhasePanel';
 
-/** Interactive election timeline — select a phase to view details. */
-export const Timeline = () => {
+PhasePanel.propTypes = {
+  phase: PropTypes.shape({
+    icon: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    short: PropTypes.string.isRequired,
+    detail: PropTypes.string.isRequired,
+    tags: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
+  panelRef: PropTypes.oneOfType([
+    PropTypes.func, 
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) })
+  ]).isRequired,
+};
+
+/** 
+ * Interactive election timeline — select a phase to view details.
+ * Coordinates state between the timeline list and the detail panel.
+ * 
+ * @component
+ */
+export const Timeline = memo(() => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const panelRef = useRef<HTMLDivElement>(null);
 
+  /**
+   * Updates the active phase and moves focus to the detail panel.
+   * @param {number} index - The index of the selected phase.
+   */
   const handleSelect = useCallback((index: number) => {
     setActiveIndex(index);
     panelRef.current?.focus();
@@ -134,4 +210,6 @@ export const Timeline = () => {
       </div>
     </section>
   );
-};
+});
+
+Timeline.displayName = 'Timeline';

@@ -1,4 +1,4 @@
-import { POLL_OFFSETS } from '../constants';
+import { POLL_OFFSETS } from '@/constants';
 import { haversineKm, estimateDriveMinutes, estimateWalkMinutes } from '../utils/geo';
 
 interface UserPosition {

@@ -1,17 +1,31 @@
 import { memo, useMemo, ReactNode } from 'react';
+import PropTypes from 'prop-types';
 
-// --- Types ---
+/**
+ * Props for the individual StatItem component.
+ */
 interface StatItemProps {
+  /** The value to display (e.g., "100%"). */
   value: string;
+  /** The descriptive label for the statistic. */
   label: string;
+  /** ARIA label for screen readers to provide context. */
   aria: string;
 }
 
+/**
+ * Props for the StatsContainer component.
+ */
 interface StatsProps {
+  /** Stat items to render within the container. */
   children: ReactNode;
+  /** Optional ARIA label for the statistics list. */
   ariaLabel?: string;
 }
 
+/**
+ * Static data for the statistics section.
+ */
 const STATS_DATA: StatItemProps[] = [
   { value: '6',    label: 'Election Phases',   aria: '6 election phases' },
   { value: '10+',  label: 'Key Terms Defined', aria: '10 or more key terms defined' },
@@ -20,10 +34,11 @@ const STATS_DATA: StatItemProps[] = [
 ];
 
 /** 
- * Compound Component Pattern: 
- * Allows flexible composition of statistic components.
+ * Single statistic display item.
+ * 
+ * @component
  */
-const StatItem = memo(function StatItem({ value, label, aria }: StatItemProps) {
+const StatItem = memo(({ value, label, aria }: StatItemProps) => {
   return (
     <div className="stat-item reveal" role="listitem">
       <div className="stat-num" aria-label={aria}>{value}</div>
@@ -31,26 +46,50 @@ const StatItem = memo(function StatItem({ value, label, aria }: StatItemProps) {
     </div>
   );
 });
-StatItem.displayName = 'Stats.Item';
 
-/** Container component for stats items */
-function StatsContainer({ children, ariaLabel = "Key statistics about ElectED" }: StatsProps) {
+StatItem.displayName = 'StatItem';
+
+StatItem.propTypes = {
+  value: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  aria: PropTypes.string.isRequired,
+};
+
+/** 
+ * Container component for stats items.
+ * Implements the compound component pattern.
+ * 
+ * @component
+ */
+const StatsContainer = memo(({ children, ariaLabel = "Key statistics about ElectED" }: StatsProps) => {
   return (
     <div className="stats" role="list" aria-label={ariaLabel}>
       {children}
     </div>
   );
-}
+});
 
-// Bind sub-components
+StatsContainer.displayName = 'StatsContainer';
+
+StatsContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+  ariaLabel: PropTypes.string,
+};
+
+/**
+ * Combined Stats component using the Compound Component Pattern.
+ */
 const Stats = Object.assign(StatsContainer, {
   Item: StatItem,
 });
 
 /** 
- * Example usage using the Compound Component Pattern 
+ * Main statistics section component.
+ * Maps through the statistics data and renders the compound Stats component.
+ * 
+ * @component
  */
-export function StatsSection() {
+export const StatsSection = memo(() => {
   const stats = useMemo(() => STATS_DATA, []);
 
   return (
@@ -60,6 +99,8 @@ export function StatsSection() {
       ))}
     </Stats>
   );
-}
+});
+
+StatsSection.displayName = 'StatsSection';
 
 export { Stats, STATS_DATA };

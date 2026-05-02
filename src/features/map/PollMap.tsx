@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, memo } from 'react';
+import PropTypes from 'prop-types';
 import { Loader, Library } from '@googlemaps/js-api-loader';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useAnalytics } from '@/hooks/useAnalytics';
@@ -14,8 +15,13 @@ import { MapPlaceholder } from './components/MapPlaceholder';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { WeatherData, Station } from './types';
 
-/** Interactive section: locates user, shows weather, and renders nearby polling stations. */
-export const PollMap = () => {
+/**
+ * Interactive section: locates user, shows weather, and renders nearby polling stations.
+ * Orchestrates Google Maps Platform, OpenMeteo API, and reverse geocoding.
+ * 
+ * @component
+ */
+export const PollMap = memo(() => {
   const { phase, userPosition, locate } = useGeolocation();
   const { trackEvent } = useAnalytics();
 
@@ -31,7 +37,10 @@ export const PollMap = () => {
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false);
 
-  // ── Intersection Observer to defer Map loading ──────────────────────────────
+  /**
+   * Intersection Observer to defer Map loading until it's near the viewport.
+   * Prevents unnecessary API calls and improves page performance.
+   */
   useEffect(() => {
     if (!sectionRef.current) return;
 
@@ -49,24 +58,43 @@ export const PollMap = () => {
     return () => observer.disconnect();
   }, []);
 
-  // ── Fetch weather + build stations ──────────────────────────────────────────
+  /**
+   * Fetches weather and location data whenever the user position is determined.
+   */
   useEffect(() => {
     if (!userPosition) return;
 
-    fetchWeather(userPosition.lat, userPosition.lng)
-      .then(setWeather)
-      .catch(() => {});
+    /** Fetches weather data. */
+    const loadWeather = async () => {
+      try {
+        const data = await fetchWeather(userPosition.lat, userPosition.lng);
+        setWeather(data);
+      } catch (_err) {
+        // Silent fail for secondary data
+      }
+    };
 
-    reverseGeocode(userPosition.lat, userPosition.lng)
-      .then(setLocationName)
-      .catch(() => setLocationName('Your Location'));
+    /** Fetches human-readable location name. */
+    const loadLocationName = async () => {
+      try {
+        const name = await reverseGeocode(userPosition.lat, userPosition.lng);
+        setLocationName(name);
+      } catch (_err) {
+        setLocationName('Your Location');
+      }
+    };
+
+    loadWeather();
+    loadLocationName();
 
     const built = buildPollingStations(userPosition) as Station[];
     setStations(built);
     setSelectedStation(built[0] ?? null);
   }, [userPosition]);
 
-  // ── Initialise Google Map (only when visible + user position ready) ──────────
+  /**
+   * Initialises Google Map (only when visible + user position ready).
+   */
   useEffect(() => {
     if (!mapRef.current || !MAPS_CONFIGURED || !userPosition || !isMapVisible) return;
 
@@ -76,29 +104,39 @@ export const PollMap = () => {
       libraries: ['places', 'directions'] as Library[],
     });
 
-    loader.load().then((google) => {
-      if (!googleMapRef.current && mapRef.current) {
-        googleMapRef.current = new google.maps.Map(mapRef.current, {
-          center: userPosition,
-          zoom: 13,
-          mapTypeId: 'roadmap',
-          styles: MAP_STYLES,
-          streetViewControl: false,
-          mapTypeControl: false,
-          fullscreenControl: true,
-          gestureHandling: 'cooperative', // Mobile-friendly scrolling
-        });
+    /** Loads Google Maps API and initializes map instance. */
+    const initMap = async () => {
+      try {
+        const google = await loader.load();
+        if (!googleMapRef.current && mapRef.current) {
+          googleMapRef.current = new google.maps.Map(mapRef.current, {
+            center: userPosition,
+            zoom: 13,
+            mapTypeId: 'roadmap',
+            styles: MAP_STYLES,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: true,
+            gestureHandling: 'cooperative',
+          });
 
-        directionsRendererRef.current = new google.maps.DirectionsRenderer({
-          suppressMarkers: true,
-          polylineOptions: { strokeColor: '#9a7322', strokeWeight: 4, strokeOpacity: 0.8 },
-        });
-        directionsRendererRef.current.setMap(googleMapRef.current);
+          directionsRendererRef.current = new google.maps.DirectionsRenderer({
+            suppressMarkers: true,
+            polylineOptions: { strokeColor: '#9a7322', strokeWeight: 4, strokeOpacity: 0.8 },
+          });
+          directionsRendererRef.current.setMap(googleMapRef.current);
+        }
+      } catch (_err) {
+        // Handled by ErrorBoundary
       }
-    });
+    };
+
+    initMap();
   }, [isMapVisible, userPosition]);
 
-  // ── Update Markers ────────────────────────────────────────────────────────
+  /**
+   * Updates Map Markers whenever stations or user position change.
+   */
   useEffect(() => {
     if (!googleMapRef.current || !userPosition) return;
 
@@ -163,7 +201,9 @@ export const PollMap = () => {
     googleMapRef.current.panTo(userPosition);
   }, [userPosition, stations, trackEvent]);
 
-  // ── Show directions ────────────────────────────────────────────────────────
+  /**
+   * Updates directions whenever the selected station changes.
+   */
   useEffect(() => {
     if (!selectedStation || !googleMapRef.current || !MAPS_CONFIGURED || !userPosition) return;
 
@@ -185,6 +225,10 @@ export const PollMap = () => {
     );
   }, [selectedStation, userPosition]);
 
+  /**
+   * Handles selection of a polling station from the list.
+   * @param {Station} station - The selected station.
+   */
   const handleSelectStation = useCallback((station: Station) => {
     setSelectedStation(station);
     if (googleMapRef.current) {
@@ -192,6 +236,12 @@ export const PollMap = () => {
       googleMapRef.current.setZoom(14);
     }
   }, []);
+
+  /** Handles the "Locate" button click. */
+  const handleLocateClick = useCallback(() => {
+    locate();
+    trackEvent('map_locate_start');
+  }, [locate, trackEvent]);
 
   const stationCountLabel = useMemo(
     () => `${stations.length} polling station${stations.length !== 1 ? 's' : ''} found nearby`,
@@ -222,10 +272,7 @@ export const PollMap = () => {
               id="locate-btn"
               className="btn-primary"
               style={{ marginTop: '1.5rem' }}
-              onClick={() => {
-                locate();
-                trackEvent('map_locate_start');
-              }}
+              onClick={handleLocateClick}
             >
               📍 Find My Polling Station
             </button>
@@ -272,7 +319,7 @@ export const PollMap = () => {
                     className="pollmap-map"
                     aria-label="Google Map showing nearby polling stations"
                     role="application"
-                    style={{ width: '100%', height: '480px' }} // CLS prevention
+                    style={{ width: '100%', height: '480px' }}
                   />
                 ) : (
                   <MapPlaceholder userPosition={userPosition} />
@@ -284,4 +331,6 @@ export const PollMap = () => {
       </div>
     </section>
   );
-};
+});
+
+PollMap.displayName = 'PollMap';

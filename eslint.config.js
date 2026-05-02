@@ -6,6 +6,7 @@ import tsparser from '@typescript-eslint/parser';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import importPlugin from 'eslint-plugin-import';
 
 export default [
   { ignores: ['dist'] },
@@ -18,6 +19,7 @@ export default [
       'react': reactPlugin, 
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'import': importPlugin,
     },
     languageOptions: { 
       parser: tsparser, 
@@ -46,6 +48,18 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      'eqeqeq': ['error', 'always'],
+      'no-console': ['error', { allow: ['info', 'debug'] }], // user said ALL console.log, error, warn
+      'no-undef': 'error',
+      'import/order': [
+        'error',
+        {
+          'groups': ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          'newlines-between': 'always',
+          'alphabetize': { 'order': 'asc', 'caseInsensitive': true }
+        }
+      ],
+      'react/prop-types': 'error',
     },
   },
 ];

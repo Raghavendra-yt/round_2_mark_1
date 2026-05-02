@@ -1,15 +1,26 @@
 import { useState, useCallback, useMemo, ChangeEvent, memo } from 'react';
+import PropTypes from 'prop-types';
+
 import { glossaryTerms } from '@/data/content';
-import { useDebounce } from '@/hooks/useDebounce';
 import { SEARCH_DEBOUNCE_MS } from '@/constants';
+import { useDebounce } from '@/hooks/useDebounce';
 import { sanitizeText } from '@/utils/sanitize';
 
+/**
+ * Data structure for a glossary term.
+ */
 interface GlossaryItemData {
+  /** The term being defined. */
   term: string;
+  /** The definition of the term. */
   def: string;
 }
 
-/** Individual glossary term card, memoized for performance. */
+/** 
+ * Individual glossary term card, memoized for performance.
+ * 
+ * @component
+ */
 const GlossaryCard = memo(({ item }: { item: GlossaryItemData }) => (
   <article className="glossary-card reveal" role="listitem">
     <div className="glossary-term">{item.term}</div>
@@ -19,14 +30,24 @@ const GlossaryCard = memo(({ item }: { item: GlossaryItemData }) => (
 
 GlossaryCard.displayName = 'GlossaryCard';
 
+GlossaryCard.propTypes = {
+  item: PropTypes.shape({
+    term: PropTypes.string.isRequired,
+    def: PropTypes.string.isRequired,
+  }).isRequired,
+};
+
 /**
  * Searchable election glossary section.
  * Uses a debounced search input to filter terms without excessive re-renders.
+ * 
+ * @component
  */
-export const Glossary = () => {
+export const Glossary = memo(() => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const debouncedQuery = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
 
+  /** Handles changes to the search input, including sanitization. */
   const handleSearchChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(sanitizeText(event.target.value));
   }, []);
@@ -54,8 +75,8 @@ export const Glossary = () => {
           news with confidence.
         </p>
 
-        {/* Debounced search */}
         <div className="glossary-search reveal">
+          <label htmlFor="glossary-search" className="sr-only">Search glossary terms</label>
           <input
             id="glossary-search"
             type="search"
@@ -63,7 +84,6 @@ export const Glossary = () => {
             placeholder="Search terms…"
             value={searchQuery}
             onChange={handleSearchChange}
-            aria-label="Search glossary terms"
             aria-controls="glossary-results"
             autoComplete="off"
           />
@@ -87,4 +107,6 @@ export const Glossary = () => {
       </div>
     </section>
   );
-};
+});
+
+Glossary.displayName = 'Glossary';

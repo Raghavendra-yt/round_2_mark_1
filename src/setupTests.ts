@@ -1,5 +1,28 @@
 import '@testing-library/jest-dom';
 
+// Mock Vite's import.meta.env
+(global as any).import = {
+  meta: {
+    env: {
+      VITE_GOOGLE_MAPS_API_KEY: 'test-key',
+      VITE_FIREBASE_API_KEY: 'test-key',
+      VITE_FIREBASE_AUTH_DOMAIN: 'test-domain',
+      VITE_FIREBASE_PROJECT_ID: 'test-project',
+      VITE_FIREBASE_STORAGE_BUCKET: 'test-bucket',
+      VITE_FIREBASE_MESSAGING_SENDER_ID: '123',
+      VITE_FIREBASE_APP_ID: '1:123:web:123',
+      VITE_FIREBASE_MEASUREMENT_ID: 'G-123',
+    }
+  }
+};
+
+// Alternative for some environments
+if (!(global as any).importMeta) {
+  Object.defineProperty(global, 'importMeta', {
+    value: (global as any).import.meta
+  });
+}
+
 // Mock IntersectionObserver
 window.IntersectionObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
@@ -47,6 +70,7 @@ jest.mock('firebase/firestore', () => ({
   limit: jest.fn(),
   getDocs: jest.fn(),
   addDoc: jest.fn(),
+  onSnapshot: jest.fn(() => jest.fn()), // Returns unobserve function
 }));
 
 jest.mock('firebase/storage', () => ({
@@ -56,9 +80,15 @@ jest.mock('firebase/storage', () => ({
   getDownloadURL: jest.fn(),
 }));
 
+jest.mock('firebase/analytics', () => ({
+  getAnalytics: jest.fn(),
+  isSupported: jest.fn().mockResolvedValue(true),
+  logEvent: jest.fn(),
+}));
+
 // Google Maps mock
 jest.mock('@googlemaps/js-api-loader', () => ({
   Loader: jest.fn().mockImplementation(() => ({
-    load: jest.fn().mockResolvedValue(window.google),
+    load: jest.fn().mockResolvedValue({}),
   })),
 }));
