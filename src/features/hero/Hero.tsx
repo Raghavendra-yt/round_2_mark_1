@@ -1,4 +1,4 @@
-import { useRef, memo } from 'react';
+import { useRef, memo, JSX } from 'react';
 
 interface ParticleProps {
   size: number;
@@ -7,8 +7,12 @@ interface ParticleProps {
   delay: number;
 }
 
+interface ParticleData extends ParticleProps {
+  id: number;
+}
+
 /** Single animated particle in the hero background. */
-const Particle = memo(({ size, left, duration, delay }: ParticleProps) => {
+const Particle = memo<ParticleProps>(function Particle({ size, left, duration, delay }): JSX.Element {
   return (
     <div
       className="particle"
@@ -23,12 +27,10 @@ const Particle = memo(({ size, left, duration, delay }: ParticleProps) => {
   );
 });
 
-Particle.displayName = 'Particle';
-
 /** Full-bleed hero section with animated particles and CTA buttons. */
 export const Hero = () => {
   // Stable particles via ref — won't re-randomize on re-renders
-  const particlesRef = useRef(
+  const particlesRef = useRef<ParticleData[]>(
     Array.from({ length: 14 }, (_, index) => ({
       id: index,
       size: Math.random() * 4 + 2,

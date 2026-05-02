@@ -1,6 +1,6 @@
 import { useState, useCallback, ChangeEvent, useRef } from 'react';
-import { db, isFirebaseConfigured } from '@/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { isFirebaseConfigured } from '@/firebase';
+import { leaderboardService } from '@/services/leaderboardService';
 import { sanitizeName } from '@/utils/sanitize';
 import { SaveScoreModalProps } from '../types';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -23,7 +23,7 @@ export const SaveScoreModal = ({ score, total, onClose }: SaveScoreModalProps) =
   }, []);
 
   const handleSave = useCallback(async () => {
-    if (!isFirebaseConfigured || !db) return;
+    if (!isFirebaseConfigured) return;
     
     const finalName = sanitizeName(name).trim() || 'Anonymous';
     if (finalName.length > 32) {
@@ -39,12 +39,7 @@ export const SaveScoreModal = ({ score, total, onClose }: SaveScoreModalProps) =
     setIsSaving(true);
     setSaveError('');
     try {
-      await addDoc(collection(db, 'quizScores'), {
-        name: finalName,
-        score,
-        total,
-        createdAt: serverTimestamp(),
-      });
+      await leaderboardService.saveScore(finalName, score, total);
       setIsSaved(true);
       trackEvent('quiz_score_save', { score, total });
     } catch (err: unknown) {
@@ -53,7 +48,7 @@ export const SaveScoreModal = ({ score, total, onClose }: SaveScoreModalProps) =
     } finally {
       setIsSaving(false);
     }
-  }, [name, score, total]);
+  }, [name, score, total, trackEvent]);
 
   if (!isFirebaseConfigured) return null;
 

@@ -1,37 +1,50 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ErrorInfo } from 'react';
 
-interface Props {
-  children: ReactNode;
-  fallback: ReactNode;
-  componentName: string;
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
+  errorMessage: string;
 }
 
 /**
  * Generic Error Boundary to catch UI errors and prevent app crashes.
- * Logs errors to console (and could be extended to log to Analytics).
  */
-export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-  };
-
-  public static getDerivedStateFromError(): State {
-    return { hasError: true };
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, errorMessage: '' };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error(`Error in ${this.props.componentName}:`, error, errorInfo);
+  public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, errorMessage: error.message };
   }
 
-  public render() {
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+  }
+
+  public render(): React.ReactNode {
     if (this.state.hasError) {
-      return this.props.fallback;
+      return (
+        <div className="error-boundary-fallback" role="alert" style={{ padding: '2rem', textAlign: 'center' }}>
+          <h2>Something went wrong.</h2>
+          <p>{this.state.errorMessage}</p>
+          <button 
+            className="btn-primary" 
+            onClick={() => window.location.reload()}
+            style={{ marginTop: '1rem' }}
+          >
+            Reload Page
+          </button>
+        </div>
+      );
     }
 
     return this.props.children;
   }
 }
+
+export default ErrorBoundary;

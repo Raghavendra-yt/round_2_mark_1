@@ -1,6 +1,11 @@
 import { POLL_OFFSETS } from '../constants';
 import { haversineKm, estimateDriveMinutes, estimateWalkMinutes } from '../utils/geo';
 
+interface UserPosition {
+  lat: number;
+  lng: number;
+}
+
 export interface PollingStation {
   id: string;
   name: string;
@@ -16,10 +21,10 @@ export interface PollingStation {
  * Builds mock polling station data relative to the user's position.
  * Stations are sorted nearest-first.
  *
- * @param {{ lat: number, lng: number }} userPosition
+ * @param {UserPosition} userPosition
  * @returns {PollingStation[]} Sorted station list.
  */
-export const buildPollingStations = (userPosition: { lat: number; lng: number }): PollingStation[] => {
+export function buildPollingStations(userPosition: UserPosition): PollingStation[] {
   const { lat, lng } = userPosition;
 
   return POLL_OFFSETS.map((offset) => {
@@ -38,4 +43,4 @@ export const buildPollingStations = (userPosition: { lat: number; lng: number })
       walkMinutes: estimateWalkMinutes(distanceKm),
     };
   }).sort((a, b) => a.distanceKm - b.distanceKm);
-};
+}

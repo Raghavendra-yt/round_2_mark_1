@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react';
-import { db, isFirebaseConfigured } from '@/firebase';
-import {
-  collection,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-} from 'firebase/firestore';
-import { QUIZ_LEADERBOARD_LIMIT } from '@/constants';
+import { isFirebaseConfigured } from '@/firebase';
+import { leaderboardService } from '@/services/leaderboardService';
 import { LeaderboardEntry } from '../types';
 
 const RANK_LABELS = ['🥇', '🥈', '🥉', '4th', '5th'];
@@ -18,34 +11,17 @@ export const Leaderboard = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (!isFirebaseConfigured || !db) {
+    if (!isFirebaseConfigured) {
       setIsLoading(false);
       return;
     }
 
-    const leaderboardQuery = query(
-      collection(db, 'quizScores'),
-      orderBy('score', 'desc'),
-      limit(QUIZ_LEADERBOARD_LIMIT)
-    );
+    // Use service for real-time syncing
+    const unsubscribe = leaderboardService.subscribeToLeaderboard((newScores) => {
+      setScores(newScores);
+      setIsLoading(false);
+    });
 
-    // Use onSnapshot for real-time updates and efficient syncing
-    const unsubscribe = onSnapshot(
-      leaderboardQuery,
-      (snapshot) => {
-        const newScores = snapshot.docs.map(
-          (doc) => ({ id: doc.id, ...doc.data() } as LeaderboardEntry)
-        );
-        setScores(newScores);
-        setIsLoading(false);
-      },
-      (error) => {
-        console.error('Leaderboard subscription error:', error);
-        setIsLoading(false);
-      }
-    );
-
-    // Cleanup listener on unmount to prevent memory leaks
     return () => unsubscribe();
   }, []);
 

@@ -12,7 +12,7 @@ import { StationList } from './components/StationList';
 import { TripCard } from './components/TripCard';
 import { MapPlaceholder } from './components/MapPlaceholder';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { WeatherData, PollingStation } from './types';
+import { WeatherData, Station } from './types';
 
 /** Interactive section: locates user, shows weather, and renders nearby polling stations. */
 export const PollMap = () => {
@@ -27,8 +27,8 @@ export const PollMap = () => {
 
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [locationName, setLocationName] = useState<string>('');
-  const [stations, setStations] = useState<PollingStation[]>([]);
-  const [selectedStation, setSelectedStation] = useState<PollingStation | null>(null);
+  const [stations, setStations] = useState<Station[]>([]);
+  const [selectedStation, setSelectedStation] = useState<Station | null>(null);
   const [isMapVisible, setIsMapVisible] = useState<boolean>(false);
 
   // ── Intersection Observer to defer Map loading ──────────────────────────────
@@ -61,7 +61,7 @@ export const PollMap = () => {
       .then(setLocationName)
       .catch(() => setLocationName('Your Location'));
 
-    const built = buildPollingStations(userPosition) as PollingStation[];
+    const built = buildPollingStations(userPosition) as Station[];
     setStations(built);
     setSelectedStation(built[0] ?? null);
   }, [userPosition]);
@@ -185,7 +185,7 @@ export const PollMap = () => {
     );
   }, [selectedStation, userPosition]);
 
-  const handleSelectStation = useCallback((station: PollingStation) => {
+  const handleSelectStation = useCallback((station: Station) => {
     setSelectedStation(station);
     if (googleMapRef.current) {
       googleMapRef.current.panTo({ lat: station.lat, lng: station.lng });

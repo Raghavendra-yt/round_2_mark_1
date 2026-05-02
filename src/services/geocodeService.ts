@@ -1,27 +1,66 @@
 import { GEOCODE_API_BASE } from '../constants';
+import { apiClient } from './apiClient';
+
+const CACHE_KEY = 'elected_geocode_cache';
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+
+interface CachedGeocode {
+  timestamp: number;
+  name: string;
+}
 
 /**
  * Reverse-geocodes coordinates to a human-readable city/town name.
- * Uses the free Nominatim (OpenStreetMap) API — no key required.
- *
- * @param {number} latitude
- * @param {number} longitude
- * @returns {Promise<string>} Location name (city, town, village, or county).
- * @throws {Error} on network errors
+ * Implements persistent caching based on coordinate clustering (3 decimal places).
  */
-export const reverseGeocode = async (latitude: number, longitude: number): Promise<string> => {
-  const url = new URL(GEOCODE_API_BASE);
-  url.searchParams.set('lat', String(latitude));
-  url.searchParams.set('lon', String(longitude));
-  url.searchParams.set('format', 'json');
+export async function reverseGeocode(latitude: number, longitude: number): Promise<string> {
+  const latKey = latitude.toFixed(3);
+  const lonKey = longitude.toFixed(3);
+  const cacheKey = `${CACHE_KEY}_${latKey}_${lonKey}`;
 
-  const response = await fetch(url.href, {
-    headers: { 'Accept-Language': 'en' },
-  });
-  if (!response.ok) {
-    throw new Error(`Geocode API error: ${response.status}`);
+  // Check cache
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const { timestamp, name }: CachedGeocode = JSON.parse(cached);
+      if (Date.now() - timestamp < CACHE_TTL) {
+        return name;
+      }
+    }
+  } catch (err) {
+    // Ignore cache errors
   }
-  const data = await response.json();
-  const { address } = data;
-  return address.city ?? address.town ?? address.village ?? address.county ?? 'Your Area';
-};
+
+  const url = apiClient.buildUrl(GEOCODE_API_BASE, {
+    lat: latitude,
+    lon: longitude,
+    format: 'json'
+  });
+
+  try {
+    const data = await apiClient.get<any>(url, {
+      headers: { 
+        'Accept-Language': 'en',
+        'User-Agent': 'CivicGuide-App/1.0'
+      },
+    });
+
+    const { address } = data;
+    const locationName = address.city ?? address.town ?? address.village ?? address.county ?? 'Your Area';
+
+    // Update cache
+    try {
+      localStorage.setItem(cacheKey, JSON.stringify({
+        timestamp: Date.now(),
+        name: locationName,
+      }));
+    } catch (e) {
+      // Ignore quota errors
+    }
+
+    return locationName;
+  } catch (err) {
+    console.error('Geocoding error:', err);
+    return 'Your Location';
+  }
+}

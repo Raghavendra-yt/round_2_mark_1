@@ -4,36 +4,36 @@ export interface WeatherData {
   windspeed: number;
 }
 
-export interface PollingStation {
-  id: string;
-  name: string;
-  type: string;
-  lat: number;
-  lng: number;
-  distanceKm: number;
-  driveMinutes: number;
-  walkMinutes: number;
-}
-
 export interface WeatherCardProps {
   weather: WeatherData | null;
   locationName: string;
 }
 
+export interface Station {
+  id: string;
+  name: string;
+  type: string;
+  distanceKm: number;
+  driveMinutes: number;
+  walkMinutes: number;
+  lat: number;
+  lng: number;
+}
+
 export interface StationItemProps {
-  station: PollingStation;
+  station: Station;
   isSelected: boolean;
-  onSelect: (station: PollingStation) => void;
+  onSelect: (station: Station) => void;
 }
 
 export interface StationListProps {
-  stations: PollingStation[];
+  stations: Station[];
   selectedId: string | null;
-  onSelect: (station: PollingStation) => void;
+  onSelect: (station: Station) => void;
 }
 
 export interface TripCardProps {
-  station: PollingStation;
+  station: Station;
 }
 
 export interface MapPlaceholderProps {

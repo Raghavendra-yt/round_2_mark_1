@@ -1,32 +1,67 @@
 import { WEATHER_API_BASE } from '../constants';
+import { apiClient } from './apiClient';
 
-export interface WeatherResponse {
+export interface CurrentWeather {
   temperature: number;
   weathercode: number;
   windspeed: number;
+  winddirection: number;
+  is_day: number;
   time: string;
+}
+
+const CACHE_KEY = 'elected_weather_cache';
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+interface CachedWeather {
+  timestamp: number;
+  data: CurrentWeather;
 }
 
 /**
  * Fetches current weather data from the Open-Meteo free API.
- * No API key required.
- *
- * @param {number} latitude
- * @param {number} longitude
- * @returns {Promise<WeatherResponse>} current_weather object from Open-Meteo
- * @throws {Error} on network or API errors
+ * Implements client-side caching to reduce redundant API calls.
  */
-export const fetchWeather = async (latitude: number, longitude: number): Promise<WeatherResponse> => {
-  const url = new URL(WEATHER_API_BASE);
-  url.searchParams.set('latitude', String(latitude));
-  url.searchParams.set('longitude', String(longitude));
-  url.searchParams.set('current_weather', 'true');
-  url.searchParams.set('timezone', 'auto');
-
-  const response = await fetch(url.href);
-  if (!response.ok) {
-    throw new Error(`Weather API error: ${response.status}`);
+export async function fetchWeather(latitude: number, longitude: number): Promise<CurrentWeather> {
+  const cacheKey = `${CACHE_KEY}_${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
+  
+  // Check cache
+  try {
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      const { timestamp, data }: CachedWeather = JSON.parse(cached);
+      if (Date.now() - timestamp < CACHE_TTL) {
+        return data;
+      }
+    }
+  } catch (err) {
+    // Silently continue if cache fails
   }
-  const json = await response.json();
-  return json.current_weather as WeatherResponse;
-};
+
+  const url = apiClient.buildUrl(WEATHER_API_BASE, {
+    latitude,
+    longitude,
+    current_weather: 'true',
+    timezone: 'auto'
+  });
+
+  try {
+    const json = await apiClient.get<any>(url);
+    const weatherData = json.current_weather as CurrentWeather;
+
+    // Update cache
+    try {
+      sessionStorage.setItem(cacheKey, JSON.stringify({
+        timestamp: Date.now(),
+        data: weatherData,
+      }));
+    } catch (e) {
+      // Ignore quota errors
+    }
+
+    return weatherData;
+  } catch (err) {
+    console.error('Weather fetch error:', err);
+    throw err;
+  }
+}
