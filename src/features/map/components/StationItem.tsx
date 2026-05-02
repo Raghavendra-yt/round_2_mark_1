@@ -8,7 +8,8 @@ const StationItemComponent = ({ station, isSelected, onSelect }: StationItemProp
     <button
       className={`station-item${isSelected ? ' selected' : ''}`}
       onClick={() => onSelect(station)}
-      aria-label={`${station.name} — ${station.type} — ${formatDistance(station.distanceKm)} away — ${station.driveMinutes} min drive`}
+      aria-label={`${station.name}, ${station.type}. Distance: ${formatDistance(station.distanceKm)}. Travel time: ${station.driveMinutes} minutes by car, ${station.walkMinutes} minutes walking.`}
+      aria-current={isSelected ? 'location' : undefined}
       aria-pressed={isSelected}
     >
       <div className="station-item-left">

@@ -1,6 +1,9 @@
+import toast from 'react-hot-toast';
+
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 /**
- * Minimal API client wrapper for standardized fetch calls.
- * Handles common headers, error normalization, and potential timeouts.
+ * Global Systems Integrator Wrapper for API calls.
  */
 export const apiClient = {
   get: async <T>(url: string, options: RequestInit = {}): Promise<T> => {
@@ -13,10 +16,23 @@ export const apiClient = {
     });
 
     if (!response.ok) {
-      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      const message = errorData.detail || `API Error: ${response.status} ${response.statusText}`;
+      
+      // Global Error Propagation: Notify the user immediately
+      toast.error(message, { id: 'api-error' });
+      throw new Error(message);
     }
 
     return response.json() as Promise<T>;
+  },
+
+  /**
+   * Fetches data and validates it against a Zod schema.
+   */
+  validatedGet: async <T>(url: string, schema: { parse: (data: any) => T }, options: RequestInit = {}): Promise<T> => {
+    const data = await apiClient.get<any>(url, options);
+    return schema.parse(data);
   },
 
   /**
